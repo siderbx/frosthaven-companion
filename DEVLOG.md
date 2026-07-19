@@ -24,6 +24,10 @@ Running log of work on this project: what's done, what's in progress, and what's
   - Card names + initiative values are pre-filled (verified from the card art); top/bottom ability text is left blank for the user to paraphrase themselves — deliberately not transcribing Cephalofair's exact card wording into the public repo (see prior note on this).
   - Seeded the **Perks** tab from the user's photographed perk sheet (`src/data/voidwardenPerks.ts`), expanding repeatable perks (e.g. "Replace one +0 card..." ×3) into individual checkbox rows to match the physical sheet.
   - Verified all of this in-browser (JS-dispatched clicks, since the browser automation's synthetic click occasionally no-ops — confirmed via console that it's a tooling quirk, not an app bug) before shipping.
+- **2026-07-19** **Correction from the user**: the above entry's "3 X-cards are gained via level-up" framing was wrong. All 14 cards — both "1" and "X" crown — are available from level 1; there's no per-level card unlocking in JOTL at all. The "1"/"X" distinction on the card art means something else (not determined). Fixed:
+  - `buildVoidwardenActionCards()` now gives every card `level: 1` (previously the 3 Reserve cards had a placeholder `level: 0`).
+  - Reserve section copy changed from "Cards you've unlocked but haven't chosen..." to "All 14 cards are available from level 1 — these are just the ones not currently in your hand of 11."
+  - The Reserve/Hand split itself didn't need to change — it's still mechanically correct (hand size 11 < pool 14 means *some* split is always needed), it just isn't gated by level; the default split is an arbitrary starting point, freely rearrangeable via the swap buttons.
 
 ## In Progress
 
@@ -31,7 +35,6 @@ _(nothing yet)_
 
 ## Todo
 
-- Pin down the exact unlock level for Cold Embrace / Resigned Frenzy / Sap Warmth if it turns out to be documented somewhere (rulebook, envelope) — would let the app show "level X" on those Reserve cards instead of leaving it open-ended.
 - Fill in top/bottom action text for all 14 cards from the physical cards (currently blank by design).
 - Decide on real-time party-state architecture if/when this needs to sync across multiple players' devices — likely a Durable Object per campaign/session, deferred since the current scope is single-character/single-device.
 - Consider wiring Perks directly into Modifier Deck composition (currently two separate manual steps) once the perk list/deck-effects are entered once and stabilize.

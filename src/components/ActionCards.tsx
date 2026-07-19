@@ -310,7 +310,7 @@ export function ActionCards({ cards, onChange }: ActionCardsProps) {
           {reserve.length > 0 && (
             <>
               <h3>Reserve ({reserve.length})</h3>
-              <p className="field-hint">Cards you've unlocked but haven't chosen for your active hand yet.</p>
+              <p className="field-hint">All 14 cards are available from level 1 — these are just the ones not currently in your hand of 11.</p>
               {reserve.map((card) => (
                 <div key={card.id} className="action-card compact reserve-row">
                   <span>

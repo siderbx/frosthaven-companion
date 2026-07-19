@@ -27,11 +27,15 @@ export const VOIDWARDEN_XP_BY_LEVEL: Record<number, number> = {
 }
 
 /**
- * The 11 cards marked with a "1" in the crown icon on gloomhavencards.com —
- * these make up the full starting hand (hand size is 11), no choice involved.
- * Initiative values read directly from the card art.
+ * All 14 Human Voidwarden action cards — every card is available from level 1
+ * (there's no per-level unlocking in Jaws of the Lion). Hand size is 11, so
+ * players choose which 11 of these 14 make up their active hand; the rest
+ * stay in Reserve. Initiative values read directly from the card art.
+ *
+ * The default hand/reserve split below is just a starting point — swap
+ * freely in the Action Cards tab, it has no mechanical significance.
  */
-const STARTING_HAND: Array<{ name: string; initiative: number }> = [
+const DEFAULT_HAND: Array<{ name: string; initiative: number }> = [
   { name: 'Signs of the Void', initiative: 15 },
   { name: 'Suggestion', initiative: 23 },
   { name: 'Grasp of Doom', initiative: 36 },
@@ -45,23 +49,17 @@ const STARTING_HAND: Array<{ name: string; initiative: number }> = [
   { name: 'Gift of the Void', initiative: 89 },
 ]
 
-/**
- * The 3 cards marked with an "X" (not a number) in the crown icon — gained
- * later via level-up, exact level not printed on the card itself. Seeded
- * into Reserve; move each to Hand once your rulebook confirms you've
- * unlocked it.
- */
-const LEVEL_UP_POOL: Array<{ name: string; initiative: number }> = [
+const DEFAULT_RESERVE: Array<{ name: string; initiative: number }> = [
   { name: 'Resigned Frenzy', initiative: 26 },
   { name: 'Sap Warmth', initiative: 59 },
   { name: 'Cold Embrace', initiative: 71 },
 ]
 
 export function buildVoidwardenActionCards(): ActionCard[] {
-  const card = (name: string, initiative: number, status: ActionCard['status'], level: number): ActionCard => ({
+  const card = (name: string, initiative: number, status: ActionCard['status']): ActionCard => ({
     id: crypto.randomUUID(),
     name,
-    level,
+    level: 1,
     initiative,
     topText: '',
     bottomText: '',
@@ -72,7 +70,7 @@ export function buildVoidwardenActionCards(): ActionCard[] {
   })
 
   return [
-    ...STARTING_HAND.map((c) => card(c.name, c.initiative, 'hand', 1)),
-    ...LEVEL_UP_POOL.map((c) => card(c.name, c.initiative, 'reserve', 0)),
+    ...DEFAULT_HAND.map((c) => card(c.name, c.initiative, 'hand')),
+    ...DEFAULT_RESERVE.map((c) => card(c.name, c.initiative, 'reserve')),
   ]
 }
