@@ -6,17 +6,17 @@ export interface CharacterState {
   gold: number
   maxHp: number
   currentHp: number
+  /** Battle Goal checkmarks earned — every 3 grants one perk pick (up to 6 perk picks this way) */
+  battleGoalCheckmarks: number
 }
 
 export interface Perk {
   id: string
   label: string
-  /** Battle-goal checkmarks needed to earn this perk that way (the boxes printed on the sheet) */
-  boxesRequired: number
-  /** Battle-goal checkmarks spent toward this perk so far */
-  boxesFilled: number
-  /** Taken — either because boxesFilled reached boxesRequired, or picked directly at a level-up */
-  checked: boolean
+  /** How many times this perk can be picked (the boxes printed on the sheet) — usually 1, sometimes more */
+  timesAvailable: number
+  /** How many perk picks (from leveling up or every 3 Battle Goal checkmarks) have been spent on this perk */
+  timesTaken: number
 }
 
 export interface ModifierCardType {

@@ -32,6 +32,20 @@ Running log of work on this project: what's done, what's in progress, and what's
   - `Perk` type changed from `{ checked }` to `{ boxesRequired, boxesFilled, checked }`.
   - `voidwardenPerks.ts` reverted from the wrongly-expanded 15-row list back to the correct **11 perks**, each with its real box count (1, 1, 2, 3, 1, 2, 1, 1, 1, 1, 1).
   - `PerkList` now renders clickable box pips per perk (fills toward `boxesRequired`, auto-checks "Taken" when full) plus an independent "Taken" toggle for the level-up path — tested both: filling a 1-box perk auto-checks it, filling 1-of-2 on a 2-box perk correctly leaves it unchecked.
+- **2026-07-19** User provided an authoritative source — the [m-ender/gloomhaven-rules](https://github.com/m-ender/gloomhaven-rules) repo, a full text transcription of the official Gloomhaven rulebook. Read the primary source directly (downloaded `README-no-images.md`, grepped for the exact passages) rather than relying on a lossy fetch summary, since the file is ~135KB and a summarizing fetch had missed the key section entirely on the first attempt. This settled two things definitively:
+  - **The Perks rework above was still wrong.** The actual rule (p.44-45, quoted verbatim): *"when leveling up, the player can mark **one** of the perk boxes... If a perk has multiple check boxes next to it, this means that the perk can be gained multiple times for the cost of one perk each"* and *"For every three checkmarks a character earns, he or she immediately gains an additional perk... A character can achieve a total of six additional perks in this way."* So it's not "box count = Battle Goal cost for that specific perk" (what got built two entries up) — it's: **every level-up (uncapped) and every 3 Battle Goal checkmarks (capped at 6 perks) each grant one interchangeable "perk pick,"** spendable on *any* perk box, and a perk with N boxes can simply be picked N separate times. Reworked again:
+    - `Perk` type simplified to `{ timesAvailable, timesTaken }` — no more artificial "battle-goal-cost vs level-up" distinction, no separate "Taken" toggle.
+    - Added `battleGoalCheckmarks` to `CharacterState` with a counter + hint ("N more for a perk pick") on the Character tab, matching the rulebook's "notes section... includes a track for checkmarks."
+    - Verified in-browser: clicking a perk's box increments `timesTaken`, header shows "picks spent / picks total" across all perks.
+  - **Confirms the Action Cards fix from two entries up was right all along**: *"each character also has immediate access to three Level X cards"* (p.45) — exactly matches our 14-card pool (11 Level-1 + 3 Level-X) and the Reserve/Hand design, no further changes needed there.
+
+## References
+
+External sources consulted while building the Voidwarden companion, for anyone picking this up later:
+
+- **[m-ender/gloomhaven-rules](https://github.com/m-ender/gloomhaven-rules)** — full text transcription of the official Gloomhaven rulebook. The authoritative source for core mechanics (leveling, perks, Battle Goals, attack modifier deck, hand-building). When fetching it, prefer downloading `README-no-images.md` directly and grepping rather than a summarizing fetch — the file is large enough that summarization tools have dropped whole sections.
+- **[gloomhavencards.com/jotl/characters/VW](https://www.gloomhavencards.com/jotl/characters/VW)** — Jaws of the Lion Voidwarden card browser. Used to verify actual card names, initiative values, and the "1"/"X" level markers (card art is rendered as images, not readable via a plain text fetch — had to navigate the actual image URLs and zoom in with the browser tool to read them). Good for exact card stats; its "Build Mode" does *not* enforce real unlock rules, so don't infer game mechanics from what it lets you click.
+- User-supplied photos of the physical **Voidwarden character mat** and **perk sheet** — the ground truth for HP-by-level, XP thresholds, hand size, and the exact perk list/box counts, and the source of two corrections to earlier assumptions (see entries above).
 
 ## In Progress
 

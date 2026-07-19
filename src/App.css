@@ -364,20 +364,6 @@
   border-color: var(--accent-strong);
 }
 
-.taken-toggle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  white-space: nowrap;
-  opacity: 0.85;
-}
-
-.taken-toggle input {
-  width: 18px;
-  height: 18px;
-}
-
 .add-row {
   display: flex;
   gap: 8px;
@@ -567,7 +553,7 @@
     grid-template-columns: 2fr 1fr;
   }
   .stat-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

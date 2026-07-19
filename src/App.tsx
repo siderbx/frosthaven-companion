@@ -21,14 +21,14 @@ const defaultCharacter: CharacterState = {
   gold: 0,
   maxHp: VOIDWARDEN_HP_BY_LEVEL[1],
   currentHp: VOIDWARDEN_HP_BY_LEVEL[1],
+  battleGoalCheckmarks: 0,
 }
 
 const seededPerks: Perk[] = VOIDWARDEN_PERKS.map((p) => ({
   id: crypto.randomUUID(),
   label: p.label,
-  boxesRequired: p.boxesRequired,
-  boxesFilled: 0,
-  checked: false,
+  timesAvailable: p.timesAvailable,
+  timesTaken: 0,
 }))
 
 const seededCards: ActionCard[] = buildVoidwardenActionCards()

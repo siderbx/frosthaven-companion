@@ -1,23 +1,24 @@
 /**
  * Human Voidwarden perk sheet, transcribed from the physical perk sheet.
- * Each perk can be earned two ways: leveling up (pick any perk, no box
- * requirement), or completing Battle Goals — the box count is how many
- * Battle Goal checkmarks need to be spent on that specific perk to earn it
- * that way.
+ * Per the rulebook (p.44-45): every level-up grants one perk pick, and every
+ * 3 Battle Goal checkmarks grant another (up to 6 that way) — either source
+ * can be spent to check a box on any perk below. `timesAvailable` is the
+ * number of boxes printed next to that perk, i.e. how many separate times
+ * it can be picked.
  */
-export const VOIDWARDEN_PERKS: Array<{ label: string; boxesRequired: number }> = [
-  { label: 'Remove two −1 cards', boxesRequired: 1 },
-  { label: 'Remove one −2 card', boxesRequired: 1 },
-  { label: 'Replace one −1 card with one +1 "Heal 1, Shield 1 ally" card', boxesRequired: 2 },
-  { label: 'Replace one +0 card with one +1 "Heal 1, Shield 1 ally" card', boxesRequired: 3 },
-  { label: 'Replace one +0 card with one +1 Dark card', boxesRequired: 1 },
-  { label: 'Replace one +0 card with one +1 Frost card', boxesRequired: 2 },
-  { label: 'Add two +1 Frost cards', boxesRequired: 1 },
-  { label: 'Add two +1 Dark cards', boxesRequired: 1 },
-  { label: 'Add one +3 card', boxesRequired: 1 },
-  { label: 'Ignore scenario effects', boxesRequired: 1 },
+export const VOIDWARDEN_PERKS: Array<{ label: string; timesAvailable: number }> = [
+  { label: 'Remove two −1 cards', timesAvailable: 1 },
+  { label: 'Remove one −2 card', timesAvailable: 1 },
+  { label: 'Replace one −1 card with one +1 "Heal 1, Shield 1 ally" card', timesAvailable: 2 },
+  { label: 'Replace one +0 card with one +1 "Heal 1, Shield 1 ally" card', timesAvailable: 3 },
+  { label: 'Replace one +0 card with one +1 Dark card', timesAvailable: 1 },
+  { label: 'Replace one +0 card with one +1 Frost card', timesAvailable: 2 },
+  { label: 'Add two +1 Frost cards', timesAvailable: 1 },
+  { label: 'Add two +1 Dark cards', timesAvailable: 1 },
+  { label: 'Add one +3 card', timesAvailable: 1 },
+  { label: 'Ignore scenario effects', timesAvailable: 1 },
   {
     label: 'Grave Defense: whenever you rest, you may consume Frost + Dark to give Dark to one ally who has Dark',
-    boxesRequired: 1,
+    timesAvailable: 1,
   },
 ]

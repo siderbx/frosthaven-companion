@@ -77,6 +77,19 @@ export function CharacterSheet({ character, onChange }: CharacterSheetProps) {
           )}
         </div>
         <Counter label="Gold" value={character.gold} min={0} step={5} onChange={(v) => set('gold', v)} />
+        <div>
+          <Counter
+            label="Battle Goal Checkmarks"
+            value={character.battleGoalCheckmarks}
+            min={0}
+            onChange={(v) => set('battleGoalCheckmarks', v)}
+          />
+          <p className="field-hint">
+            {character.battleGoalCheckmarks % 3 === 0 && character.battleGoalCheckmarks > 0
+              ? 'Enough for a perk pick — check a box on the Perks tab.'
+              : `${3 - (character.battleGoalCheckmarks % 3)} more for a perk pick`}
+          </p>
+        </div>
       </div>
     </div>
   )
