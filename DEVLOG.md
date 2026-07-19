@@ -28,6 +28,10 @@ Running log of work on this project: what's done, what's in progress, and what's
   - `buildVoidwardenActionCards()` now gives every card `level: 1` (previously the 3 Reserve cards had a placeholder `level: 0`).
   - Reserve section copy changed from "Cards you've unlocked but haven't chosen..." to "All 14 cards are available from level 1 — these are just the ones not currently in your hand of 11."
   - The Reserve/Hand split itself didn't need to change — it's still mechanically correct (hand size 11 < pool 14 means *some* split is always needed), it just isn't gated by level; the default split is an arbitrary starting point, freely rearrangeable via the swap buttons.
+- **2026-07-19** User clarified the real Perks mechanic, correcting the previous "one perk per level-up, boxes = how many times repeatable" assumption: **perks are earned two ways** — leveling up lets you pick any perk outright (no box requirement), and completing Battle Goals lets you spend checkmarks on a *specific* perk's boxes (the box count printed next to each perk is how many Battle Goal checkmarks that perk needs). Reworked accordingly:
+  - `Perk` type changed from `{ checked }` to `{ boxesRequired, boxesFilled, checked }`.
+  - `voidwardenPerks.ts` reverted from the wrongly-expanded 15-row list back to the correct **11 perks**, each with its real box count (1, 1, 2, 3, 1, 2, 1, 1, 1, 1, 1).
+  - `PerkList` now renders clickable box pips per perk (fills toward `boxesRequired`, auto-checks "Taken" when full) plus an independent "Taken" toggle for the level-up path — tested both: filling a 1-box perk auto-checks it, filling 1-of-2 on a 2-box perk correctly leaves it unchecked.
 
 ## In Progress
 

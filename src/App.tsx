@@ -23,9 +23,11 @@ const defaultCharacter: CharacterState = {
   currentHp: VOIDWARDEN_HP_BY_LEVEL[1],
 }
 
-const seededPerks: Perk[] = VOIDWARDEN_PERKS.map((label) => ({
+const seededPerks: Perk[] = VOIDWARDEN_PERKS.map((p) => ({
   id: crypto.randomUUID(),
-  label,
+  label: p.label,
+  boxesRequired: p.boxesRequired,
+  boxesFilled: 0,
   checked: false,
 }))
 

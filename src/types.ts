@@ -11,6 +11,11 @@ export interface CharacterState {
 export interface Perk {
   id: string
   label: string
+  /** Battle-goal checkmarks needed to earn this perk that way (the boxes printed on the sheet) */
+  boxesRequired: number
+  /** Battle-goal checkmarks spent toward this perk so far */
+  boxesFilled: number
+  /** Taken — either because boxesFilled reached boxesRequired, or picked directly at a level-up */
   checked: boolean
 }
 

@@ -316,35 +316,76 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 0;
+  gap: 12px;
+  padding: 12px 0;
   border-top: 1px solid var(--border);
+  flex-wrap: wrap;
 }
 
 .perk-row:first-child {
   border-top: none;
 }
 
-.perk-row.checked span {
+.perk-row.checked .perk-label {
   opacity: 0.5;
   text-decoration: line-through;
 }
 
-.perk-checkbox {
+.perk-main {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 16px;
+  gap: 14px;
+  flex: 1 1 260px;
+  min-width: 0;
 }
 
-.perk-checkbox input {
+.perk-label {
+  font-size: 15px;
+}
+
+.perk-boxes {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.perk-box {
   width: 22px;
   height: 22px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+  padding: 0;
+}
+
+.perk-box.filled {
+  background: var(--accent);
+  border-color: var(--accent-strong);
+}
+
+.taken-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+.taken-toggle input {
+  width: 18px;
+  height: 18px;
 }
 
 .add-row {
   display: flex;
   gap: 8px;
   margin-top: 16px;
+}
+
+.perk-add-row .text-input.tiny {
+  width: 56px;
 }
 
 /* Modifier deck */
