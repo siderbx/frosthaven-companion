@@ -45,7 +45,7 @@ export const CARD_TAGS = [
 
 export type CardTag = (typeof CARD_TAGS)[number]
 
-export type ActionCardStatus = 'hand' | 'used' | 'lost'
+export type ActionCardStatus = 'reserve' | 'hand' | 'used' | 'lost'
 
 export interface ActionCard {
   id: string

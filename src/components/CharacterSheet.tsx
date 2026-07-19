@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react'
-import { VOIDWARDEN_HP_BY_LEVEL } from '../data/voidwarden'
+import { VOIDWARDEN_HP_BY_LEVEL, VOIDWARDEN_XP_BY_LEVEL } from '../data/voidwarden'
 import type { CharacterState } from '../types'
 import { Counter } from './Counter'
 
@@ -20,6 +20,7 @@ export function CharacterSheet({ character, onChange }: CharacterSheetProps) {
     })
 
   const hpPct = character.maxHp > 0 ? Math.round((character.currentHp / character.maxHp) * 100) : 0
+  const nextLevelXp = VOIDWARDEN_XP_BY_LEVEL[character.level + 1]
 
   return (
     <div className="panel character-sheet">
@@ -65,7 +66,16 @@ export function CharacterSheet({ character, onChange }: CharacterSheetProps) {
 
       <div className="stat-grid">
         <Counter label="Level" value={character.level} min={1} max={9} onChange={setLevel} />
-        <Counter label="Experience" value={character.xp} min={0} step={5} onChange={(v) => set('xp', v)} />
+        <div>
+          <Counter label="Experience" value={character.xp} min={0} step={5} onChange={(v) => set('xp', v)} />
+          {nextLevelXp !== undefined && (
+            <p className="field-hint">
+              {character.xp >= nextLevelXp
+                ? `Enough XP for level ${character.level + 1}`
+                : `${nextLevelXp - character.xp} XP to level ${character.level + 1}`}
+            </p>
+          )}
+        </div>
         <Counter label="Gold" value={character.gold} min={0} step={5} onChange={(v) => set('gold', v)} />
       </div>
     </div>

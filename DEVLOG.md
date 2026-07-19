@@ -16,7 +16,14 @@ Running log of work on this project: what's done, what's in progress, and what's
   - **Action Cards** — user enters their 11 Voidwarden cards once (name/initiative/top/bottom/tags/loss flags); tracks hand/used/lost status through short/long rests, computes round initiative as the min of the two played cards (per the standard rule), and suggests pairings by tag complementarity.
   - All state persists to `localStorage` so it survives reloads on the iPad.
   - Pushed via the pipeline and confirmed live: deployed JS bundle at https://frosthaven-companion.mcarlton.workers.dev/ contains the new UI (verified via curl, not just a guess), `/api/health` still responds correctly.
-- **2026-07-19** User supplied a photo of the physical Voidwarden character mat, confirming HP by level (1–9: 6/7/8/9/10/11/12/13/14) and hand size 11. Added `src/data/voidwarden.ts` with this verified table and wired **Max HP to auto-fill from Level** in the Character tab (still manually overridable for items/effects that boost it). When leveling up: if the character was at full HP, they stay full at the new max; otherwise current HP just gets clamped to the new max, matching how the physical mat is used. Tested both cases in-browser before shipping.
+- **2026-07-19** User supplied a photo of the physical Voidwarden character mat, confirming HP by level (1–9: 6/7/8/9/10/11/12/13/14), hand size 11, and XP thresholds (45/95/150/210/275/345/420/500). Added `src/data/voidwarden.ts` with this verified table and wired **Max HP to auto-fill from Level** in the Character tab (still manually overridable for items/effects that boost it). When leveling up: if the character was at full HP, they stay full at the new max; otherwise current HP just gets clamped to the new max, matching how the physical mat is used. Tested both cases in-browser before shipping. Also added an **XP-to-next-level hint** on the Experience counter using the verified thresholds.
+- **2026-07-19** User clarified the real JOTL leveling mechanic (core Gloomhaven-style: pick one new card per level-up), correcting an earlier wrong assumption (drawn from the card site's "Build Mode," which doesn't actually enforce unlock gating). Investigated gloomhavencards.com's card art directly (zoomed into each of the 14 Voidwarden card images) and found a crown icon on every card: **11 cards marked "1"** (the full starting hand — matches hand size exactly, no choice needed) and **3 cards marked "X"** (Cold Embrace, Resigned Frenzy, Sap Warmth — the level-up bonus pool). Couldn't verify the exact level each "X" card unlocks at (not printed as a number, and no reliable secondary source), so rather than guess:
+  - Added a **`reserve`** status to `ActionCardStatus` (`reserve | hand | used | lost`) representing "owned but not in active hand."
+  - Seeded all 14 cards in `src/data/voidwarden.ts` (`buildVoidwardenActionCards`) — the 11 starting cards go straight to Hand, the 3 X-cards start in Reserve.
+  - Added **Reserve ↔ Hand** swap buttons in the Action Cards tab so the user moves each X-card over whenever their rulebook/level-up confirms they've unlocked it — sidesteps the unverified exact-level question entirely while staying mechanically accurate.
+  - Card names + initiative values are pre-filled (verified from the card art); top/bottom ability text is left blank for the user to paraphrase themselves — deliberately not transcribing Cephalofair's exact card wording into the public repo (see prior note on this).
+  - Seeded the **Perks** tab from the user's photographed perk sheet (`src/data/voidwardenPerks.ts`), expanding repeatable perks (e.g. "Replace one +0 card..." ×3) into individual checkbox rows to match the physical sheet.
+  - Verified all of this in-browser (JS-dispatched clicks, since the browser automation's synthetic click occasionally no-ops — confirmed via console that it's a tooling quirk, not an app bug) before shipping.
 
 ## In Progress
 
@@ -24,6 +31,8 @@ _(nothing yet)_
 
 ## Todo
 
+- Pin down the exact unlock level for Cold Embrace / Resigned Frenzy / Sap Warmth if it turns out to be documented somewhere (rulebook, envelope) — would let the app show "level X" on those Reserve cards instead of leaving it open-ended.
+- Fill in top/bottom action text for all 14 cards from the physical cards (currently blank by design).
 - Decide on real-time party-state architecture if/when this needs to sync across multiple players' devices — likely a Durable Object per campaign/session, deferred since the current scope is single-character/single-device.
 - Consider wiring Perks directly into Modifier Deck composition (currently two separate manual steps) once the perk list/deck-effects are entered once and stabilize.
 - Broaden beyond the Voidwarden to other classes/characters if the group wants it on more than one device.

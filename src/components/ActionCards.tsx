@@ -24,6 +24,7 @@ export function ActionCards({ cards, onChange }: ActionCardsProps) {
   const [bottomCardId, setBottomCardId] = useState<string | null>(null)
   const [restPicker, setRestPicker] = useState<'short' | 'long' | null>(null)
 
+  const reserve = cards.filter((c) => c.status === 'reserve')
   const hand = cards.filter((c) => c.status === 'hand')
   const used = cards.filter((c) => c.status === 'used')
   const lost = cards.filter((c) => c.status === 'lost')
@@ -55,6 +56,12 @@ export function ActionCards({ cards, onChange }: ActionCardsProps) {
   }
 
   const removeCard = (id: string) => onChange((prev) => prev.filter((c) => c.id !== id))
+
+  const moveToHand = (id: string) =>
+    onChange((prev) => prev.map((c) => (c.id === id ? { ...c, status: 'hand' } : c)))
+
+  const moveToReserve = (id: string) =>
+    onChange((prev) => prev.map((c) => (c.id === id ? { ...c, status: 'reserve' } : c)))
 
   const toggleTag = (tag: CardTag) =>
     setDraft((d) => ({
@@ -260,6 +267,9 @@ export function ActionCards({ cards, onChange }: ActionCardsProps) {
                   <strong>{card.name}</strong>
                   <span className="head-right">
                     <span className="init-badge">{card.initiative}</span>
+                    <button type="button" className="link-btn small" onClick={() => moveToReserve(card.id)}>
+                      To Reserve
+                    </button>
                     <button type="button" className="remove-btn" onClick={() => removeCard(card.id)} aria-label="Remove card">
                       ×
                     </button>
@@ -297,6 +307,23 @@ export function ActionCards({ cards, onChange }: ActionCardsProps) {
         </div>
 
         <div className="card-column">
+          {reserve.length > 0 && (
+            <>
+              <h3>Reserve ({reserve.length})</h3>
+              <p className="field-hint">Cards you've unlocked but haven't chosen for your active hand yet.</p>
+              {reserve.map((card) => (
+                <div key={card.id} className="action-card compact reserve-row">
+                  <span>
+                    {card.name} <span className="muted">({card.initiative})</span>
+                  </span>
+                  <button type="button" className="link-btn small" onClick={() => moveToHand(card.id)}>
+                    To Hand
+                  </button>
+                </div>
+              ))}
+            </>
+          )}
+
           <h3>Used ({used.length})</h3>
           {used.map((card) => (
             <div key={card.id} className="action-card compact">

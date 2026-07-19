@@ -146,6 +146,19 @@
   padding: 6px 8px;
 }
 
+.link-btn.small {
+  font-size: 13px;
+  padding: 4px 6px;
+  white-space: nowrap;
+}
+
+.reserve-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .remove-btn {
   border: none;
   background: transparent;

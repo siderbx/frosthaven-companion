@@ -6,7 +6,8 @@ import { ModifierDeck } from './components/ModifierDeck'
 import { ActionCards } from './components/ActionCards'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { freshDeck, defaultComposition } from './lib/modifierDeck'
-import { VOIDWARDEN_HP_BY_LEVEL } from './data/voidwarden'
+import { VOIDWARDEN_HP_BY_LEVEL, buildVoidwardenActionCards } from './data/voidwarden'
+import { VOIDWARDEN_PERKS } from './data/voidwardenPerks'
 import type { ActionCard, CharacterState, ModifierDeckState, Perk } from './types'
 
 const TABS = ['Character', 'Perks', 'Modifier Deck', 'Action Cards'] as const
@@ -22,12 +23,20 @@ const defaultCharacter: CharacterState = {
   currentHp: VOIDWARDEN_HP_BY_LEVEL[1],
 }
 
+const seededPerks: Perk[] = VOIDWARDEN_PERKS.map((label) => ({
+  id: crypto.randomUUID(),
+  label,
+  checked: false,
+}))
+
+const seededCards: ActionCard[] = buildVoidwardenActionCards()
+
 function App() {
   const [tab, setTab] = useState<Tab>('Character')
   const [character, setCharacter] = useLocalStorage<CharacterState>('fh-character', defaultCharacter)
-  const [perks, setPerks] = useLocalStorage<Perk[]>('fh-perks', [])
+  const [perks, setPerks] = useLocalStorage<Perk[]>('fh-perks', seededPerks)
   const [deck, setDeck] = useLocalStorage<ModifierDeckState>('fh-deck', freshDeck(defaultComposition()))
-  const [cards, setCards] = useLocalStorage<ActionCard[]>('fh-cards', [])
+  const [cards, setCards] = useLocalStorage<ActionCard[]>('fh-cards', seededCards)
 
   return (
     <div className="app-shell">
