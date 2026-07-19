@@ -6,6 +6,7 @@ import { ModifierDeck } from './components/ModifierDeck'
 import { ActionCards } from './components/ActionCards'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { freshDeck, defaultComposition } from './lib/modifierDeck'
+import { VOIDWARDEN_HP_BY_LEVEL } from './data/voidwarden'
 import type { ActionCard, CharacterState, ModifierDeckState, Perk } from './types'
 
 const TABS = ['Character', 'Perks', 'Modifier Deck', 'Action Cards'] as const
@@ -17,8 +18,8 @@ const defaultCharacter: CharacterState = {
   level: 1,
   xp: 0,
   gold: 0,
-  maxHp: 10,
-  currentHp: 10,
+  maxHp: VOIDWARDEN_HP_BY_LEVEL[1],
+  currentHp: VOIDWARDEN_HP_BY_LEVEL[1],
 }
 
 function App() {

@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react'
+import { VOIDWARDEN_HP_BY_LEVEL } from '../data/voidwarden'
 import type { CharacterState } from '../types'
 import { Counter } from './Counter'
 
@@ -10,6 +11,13 @@ interface CharacterSheetProps {
 export function CharacterSheet({ character, onChange }: CharacterSheetProps) {
   const set = <K extends keyof CharacterState>(key: K, value: CharacterState[K]) =>
     onChange((prev) => ({ ...prev, [key]: value }))
+
+  const setLevel = (level: number) =>
+    onChange((prev) => {
+      const maxHp = VOIDWARDEN_HP_BY_LEVEL[level] ?? prev.maxHp
+      const wasFull = prev.currentHp >= prev.maxHp
+      return { ...prev, level, maxHp, currentHp: wasFull ? maxHp : Math.min(prev.currentHp, maxHp) }
+    })
 
   const hpPct = character.maxHp > 0 ? Math.round((character.currentHp / character.maxHp) * 100) : 0
 
@@ -52,10 +60,11 @@ export function CharacterSheet({ character, onChange }: CharacterSheetProps) {
             onChange={(v) => set('maxHp', v)}
           />
         </div>
+        <p className="field-hint">Max HP auto-fills from Level (per the Voidwarden mat) — adjust it directly if an item or effect changes it.</p>
       </div>
 
       <div className="stat-grid">
-        <Counter label="Level" value={character.level} min={1} max={9} onChange={(v) => set('level', v)} />
+        <Counter label="Level" value={character.level} min={1} max={9} onChange={setLevel} />
         <Counter label="Experience" value={character.xp} min={0} step={5} onChange={(v) => set('xp', v)} />
         <Counter label="Gold" value={character.gold} min={0} step={5} onChange={(v) => set('gold', v)} />
       </div>

@@ -16,6 +16,7 @@ Running log of work on this project: what's done, what's in progress, and what's
   - **Action Cards** — user enters their 11 Voidwarden cards once (name/initiative/top/bottom/tags/loss flags); tracks hand/used/lost status through short/long rests, computes round initiative as the min of the two played cards (per the standard rule), and suggests pairings by tag complementarity.
   - All state persists to `localStorage` so it survives reloads on the iPad.
   - Pushed via the pipeline and confirmed live: deployed JS bundle at https://frosthaven-companion.mcarlton.workers.dev/ contains the new UI (verified via curl, not just a guess), `/api/health` still responds correctly.
+- **2026-07-19** User supplied a photo of the physical Voidwarden character mat, confirming HP by level (1–9: 6/7/8/9/10/11/12/13/14) and hand size 11. Added `src/data/voidwarden.ts` with this verified table and wired **Max HP to auto-fill from Level** in the Character tab (still manually overridable for items/effects that boost it). When leveling up: if the character was at full HP, they stay full at the new max; otherwise current HP just gets clamped to the new max, matching how the physical mat is used. Tested both cases in-browser before shipping.
 
 ## In Progress
 
