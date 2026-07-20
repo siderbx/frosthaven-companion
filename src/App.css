@@ -200,6 +200,12 @@
   font-size: 15px;
 }
 
+.keyword-list {
+  color: var(--text);
+  opacity: 0.65;
+  font-weight: 400;
+}
+
 .hp-block {
   margin-bottom: 20px;
 }

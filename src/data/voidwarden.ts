@@ -13,6 +13,9 @@ export const VOIDWARDEN_HP_BY_LEVEL: Record<number, number> = {
   9: 14,
 }
 
+/** Class keywords, from the character mat's Notes section. */
+export const VOIDWARDEN_KEYWORDS = ['Arcane', 'Educated', 'Outcast']
+
 /** XP required to reach each level, from the character mat. */
 export const VOIDWARDEN_XP_BY_LEVEL: Record<number, number> = {
   1: 0,
