@@ -71,8 +71,10 @@ _(nothing yet)_
   - **Guard against accidental Level changes** — leveling now cascades into HP recalculation (and should cascade into deck/card changes too), so an accidental tap needs to not silently corrode state. Needs a confirm step or similar safeguard.
   - **Action Cards are missing top/bottom text** — these were left blank by design (see Notes/Decisions below) but the user now wants them filled in from reference material, paraphrased rather than verbatim per the existing copyright approach.
   - **Level changes should prompt an action-card choice** — user reports that changing level didn't add/offer new action cards. This conflicts with what the rulebook confirmed earlier (all 14 Voidwarden cards, including the 3 "X" ones, are available from level 1 with no per-level gating) — needs clarifying with the user whether this is about something else (e.g. the Modifier Deck perk-cards above) rather than actually reintroducing level-gated action cards.
+  - **Constrain "add card" everywhere to real cards, not freeform text**: Action Cards' "+ Add card" should only let you add from the actual Voidwarden card pool (the known 14, filtered by level availability), not arbitrary typed-in cards. Modifier Deck's "Add card type" should likewise only come from perks that grant new modifier cards, not a freeform editor — ties directly into the Perks→Modifier-Deck wiring item above.
 - Decide on real-time party-state architecture if/when this needs to sync across multiple players' devices — likely a Durable Object per campaign/session, deferred since the current scope is single-character/single-device.
 - Broaden beyond the Voidwarden to other classes/characters if the group wants it on more than one device.
+- **Once the mechanics above are complete and tested, do a pass on the final layout/visual design** — sequencing note from the user: get the game logic right first, polish presentation after.
 
 ## Notes / Decisions
 
