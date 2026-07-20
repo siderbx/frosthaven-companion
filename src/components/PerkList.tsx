@@ -1,34 +1,54 @@
 import { useState, type Dispatch, type SetStateAction } from 'react'
-import type { Perk } from '../types'
+import type { CharacterState, Perk, PerkPickSource } from '../types'
+
+const POINTS_PER_PICK = 3
 
 interface PerkListProps {
   perks: Perk[]
   onChange: Dispatch<SetStateAction<Perk[]>>
+  character: CharacterState
+  onCharacterChange: Dispatch<SetStateAction<CharacterState>>
 }
 
-export function PerkList({ perks, onChange }: PerkListProps) {
+export function PerkList({ perks, onChange, character, onCharacterChange }: PerkListProps) {
   const [draftLabel, setDraftLabel] = useState('')
   const [draftTimes, setDraftTimes] = useState(1)
+  const [pendingPerkId, setPendingPerkId] = useState<string | null>(null)
 
   const addPerk = () => {
     const label = draftLabel.trim()
     if (!label) return
-    onChange((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), label, timesAvailable: draftTimes, timesTaken: 0 },
-    ])
+    onChange((prev) => [...prev, { id: crypto.randomUUID(), label, timesAvailable: draftTimes, picks: [] }])
     setDraftLabel('')
     setDraftTimes(1)
   }
 
-  const setTimesTaken = (id: string, taken: number) =>
-    onChange((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, timesTaken: Math.max(0, Math.min(taken, p.timesAvailable)) } : p)),
-    )
-
   const remove = (id: string) => onChange((prev) => prev.filter((p) => p.id !== id))
 
-  const picksSpent = perks.reduce((sum, p) => sum + p.timesTaken, 0)
+  const confirmPick = (perkId: string, source: PerkPickSource) => {
+    onChange((prev) => prev.map((p) => (p.id === perkId ? { ...p, picks: [...p.picks, source] } : p)))
+    if (source === 'points') {
+      onCharacterChange((prev) => ({
+        ...prev,
+        battleGoalCheckmarks: Math.max(0, prev.battleGoalCheckmarks - POINTS_PER_PICK),
+      }))
+    }
+    setPendingPerkId(null)
+  }
+
+  const undoPick = (perkId: string, index: number) => {
+    const perk = perks.find((p) => p.id === perkId)
+    if (!perk) return
+    const source = perk.picks[index]
+    onChange((prev) =>
+      prev.map((p) => (p.id === perkId ? { ...p, picks: p.picks.filter((_, i) => i !== index) } : p)),
+    )
+    if (source === 'points') {
+      onCharacterChange((prev) => ({ ...prev, battleGoalCheckmarks: prev.battleGoalCheckmarks + POINTS_PER_PICK }))
+    }
+  }
+
+  const picksSpent = perks.reduce((sum, p) => sum + p.picks.length, 0)
   const picksTotal = perks.reduce((sum, p) => sum + p.timesAvailable, 0)
 
   return (
@@ -41,28 +61,52 @@ export function PerkList({ perks, onChange }: PerkListProps) {
       </div>
 
       <p className="empty-hint">
-        You earn one perk pick each time you level up, plus one more for every 3 Battle Goal checkmarks
-        (track those on the Character tab) — up to 6 picks that way. Each pick checks one box below; perks
-        with multiple boxes can be picked more than once.
+        You earn one perk pick each time you level up, plus one more for every {POINTS_PER_PICK} Battle Goal
+        checkmarks (tracked on the Character tab) — up to 6 picks that way. Tapping an empty box asks which
+        source it came from; picking "Points" deducts {POINTS_PER_PICK} checkmarks from the Character tab.
       </p>
 
       <ul className="perk-list">
         {perks.map((perk) => (
-          <li key={perk.id} className={`perk-row ${perk.timesTaken >= perk.timesAvailable ? 'checked' : ''}`}>
+          <li key={perk.id} className={`perk-row ${perk.picks.length >= perk.timesAvailable ? 'checked' : ''}`}>
             <div className="perk-main">
               <span className="perk-label">{perk.label}</span>
               <div className="perk-boxes">
-                {Array.from({ length: perk.timesAvailable }).map((_, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    className={`perk-box ${i < perk.timesTaken ? 'filled' : ''}`}
-                    aria-label={`Pick ${i + 1} of ${perk.timesAvailable}`}
-                    onClick={() => setTimesTaken(perk.id, i < perk.timesTaken ? i : i + 1)}
-                  />
-                ))}
+                {Array.from({ length: perk.timesAvailable }).map((_, i) => {
+                  const source = perk.picks[i]
+                  const isNext = i === perk.picks.length
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      className={`perk-box ${source ? `filled ${source}` : ''}`}
+                      disabled={!source && !isNext}
+                      aria-label={source ? `Pick ${i + 1}, from ${source} — tap to undo` : `Pick ${i + 1} of ${perk.timesAvailable}`}
+                      onClick={() => (source ? undoPick(perk.id, i) : setPendingPerkId(perk.id))}
+                    />
+                  )
+                })}
               </div>
             </div>
+            {pendingPerkId === perk.id && (
+              <div className="pick-source-picker">
+                <span className="muted">Take via:</span>
+                <button type="button" className="secondary-btn" onClick={() => confirmPick(perk.id, 'level')}>
+                  Level
+                </button>
+                <button
+                  type="button"
+                  className="secondary-btn"
+                  disabled={character.battleGoalCheckmarks < POINTS_PER_PICK}
+                  onClick={() => confirmPick(perk.id, 'points')}
+                >
+                  Points (−{POINTS_PER_PICK}, have {character.battleGoalCheckmarks})
+                </button>
+                <button type="button" className="link-btn" onClick={() => setPendingPerkId(null)}>
+                  Cancel
+                </button>
+              </div>
+            )}
             <button type="button" className="remove-btn" onClick={() => remove(perk.id)} aria-label="Remove perk">
               ×
             </button>

@@ -10,13 +10,15 @@ export interface CharacterState {
   battleGoalCheckmarks: number
 }
 
+export type PerkPickSource = 'level' | 'points'
+
 export interface Perk {
   id: string
   label: string
   /** How many times this perk can be picked (the boxes printed on the sheet) — usually 1, sometimes more */
   timesAvailable: number
-  /** How many perk picks (from leveling up or every 3 Battle Goal checkmarks) have been spent on this perk */
-  timesTaken: number
+  /** One entry per pick spent on this perk, recording where that pick came from */
+  picks: PerkPickSource[]
 }
 
 export interface ModifierCardType {

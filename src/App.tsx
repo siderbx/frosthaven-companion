@@ -28,7 +28,7 @@ const seededPerks: Perk[] = VOIDWARDEN_PERKS.map((p) => ({
   id: crypto.randomUUID(),
   label: p.label,
   timesAvailable: p.timesAvailable,
-  timesTaken: 0,
+  picks: [],
 }))
 
 const seededCards: ActionCard[] = buildVoidwardenActionCards()
@@ -57,7 +57,9 @@ function App() {
 
       <main className="app-main">
         {tab === 'Character' && <CharacterSheet character={character} onChange={setCharacter} />}
-        {tab === 'Perks' && <PerkList perks={perks} onChange={setPerks} />}
+        {tab === 'Perks' && (
+          <PerkList perks={perks} onChange={setPerks} character={character} onCharacterChange={setCharacter} />
+        )}
         {tab === 'Modifier Deck' && <ModifierDeck deck={deck} onChange={setDeck} />}
         {tab === 'Action Cards' && <ActionCards cards={cards} onChange={setCards} />}
       </main>
