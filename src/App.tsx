@@ -45,13 +45,51 @@ const seededMasteries: Mastery[] = VOIDWARDEN_MASTERIES.map((text) => ({
   achieved: false,
 }))
 
+// Sanitizers for localStorage. Data saved by an earlier version of the app may
+// lack fields the current UI reads; each returns null to discard incompatible
+// data (falling back to the seed) rather than letting the tab that renders it
+// crash on the missing field.
+const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null
+
+// Character holds real user progress, so we merge onto defaults (filling fields
+// added later, like `resources`) instead of discarding the whole sheet.
+const sanitizeCharacter = (v: unknown): CharacterState | null => {
+  if (!isObj(v)) return null
+  const storedResources = isObj(v.resources) ? v.resources : {}
+  return {
+    ...defaultCharacter,
+    ...(v as Partial<CharacterState>),
+    resources: { ...emptyResources, ...(storedResources as Partial<Record<ResourceType, number>>) },
+  }
+}
+
+const sanitizePerks = (v: unknown): Perk[] | null =>
+  Array.isArray(v) && v.every((p) => isObj(p) && Array.isArray(p.picks) && typeof p.timesAvailable === 'number')
+    ? (v as Perk[])
+    : null
+
+const sanitizeMasteries = (v: unknown): Mastery[] | null =>
+  Array.isArray(v) && v.every((m) => isObj(m) && typeof m.text === 'string' && typeof m.achieved === 'boolean')
+    ? (v as Mastery[])
+    : null
+
+const sanitizeCards = (v: unknown): ActionCard[] | null =>
+  Array.isArray(v) && v.every((c) => isObj(c) && typeof c.status === 'string' && Array.isArray(c.tags))
+    ? (v as ActionCard[])
+    : null
+
+const sanitizeDeck = (v: unknown): ModifierDeckState | null =>
+  isObj(v) && Array.isArray(v.composition) && Array.isArray(v.drawPile) && Array.isArray(v.discardPile)
+    ? (v as unknown as ModifierDeckState)
+    : null
+
 function App() {
   const [tab, setTab] = useState<Tab>('Character')
-  const [character, setCharacter] = useLocalStorage<CharacterState>('fh-character', defaultCharacter)
-  const [perks, setPerks] = useLocalStorage<Perk[]>('fh-perks', seededPerks)
-  const [masteries, setMasteries] = useLocalStorage<Mastery[]>('fh-masteries', seededMasteries)
-  const [deck, setDeck] = useLocalStorage<ModifierDeckState>('fh-deck', freshDeck(defaultComposition()))
-  const [cards, setCards] = useLocalStorage<ActionCard[]>('fh-cards', seededCards)
+  const [character, setCharacter] = useLocalStorage<CharacterState>('fh-character', defaultCharacter, sanitizeCharacter)
+  const [perks, setPerks] = useLocalStorage<Perk[]>('fh-perks', seededPerks, sanitizePerks)
+  const [masteries, setMasteries] = useLocalStorage<Mastery[]>('fh-masteries', seededMasteries, sanitizeMasteries)
+  const [deck, setDeck] = useLocalStorage<ModifierDeckState>('fh-deck', freshDeck(defaultComposition()), sanitizeDeck)
+  const [cards, setCards] = useLocalStorage<ActionCard[]>('fh-cards', seededCards, sanitizeCards)
 
   // One-time fill of canonical card text onto cards stored before the text
   // existed. Only blank fields are touched, so it's a no-op once applied.
