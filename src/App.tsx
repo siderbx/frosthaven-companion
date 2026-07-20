@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import { CharacterSheet } from './components/CharacterSheet'
 import { PerkList } from './components/PerkList'
@@ -7,7 +7,7 @@ import { ModifierDeck } from './components/ModifierDeck'
 import { ActionCards } from './components/ActionCards'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { freshDeck, defaultComposition } from './lib/modifierDeck'
-import { VOIDWARDEN_HP_BY_LEVEL, buildVoidwardenActionCards } from './data/voidwarden'
+import { VOIDWARDEN_HP_BY_LEVEL, buildVoidwardenActionCards, withVoidwardenCardText } from './data/voidwarden'
 import { VOIDWARDEN_PERKS } from './data/voidwardenPerks'
 import { VOIDWARDEN_MASTERIES } from './data/voidwardenMasteries'
 import { RESOURCE_TYPES } from './types'
@@ -52,6 +52,13 @@ function App() {
   const [masteries, setMasteries] = useLocalStorage<Mastery[]>('fh-masteries', seededMasteries)
   const [deck, setDeck] = useLocalStorage<ModifierDeckState>('fh-deck', freshDeck(defaultComposition()))
   const [cards, setCards] = useLocalStorage<ActionCard[]>('fh-cards', seededCards)
+
+  // One-time fill of canonical card text onto cards stored before the text
+  // existed. Only blank fields are touched, so it's a no-op once applied.
+  useEffect(() => {
+    setCards((prev) => withVoidwardenCardText(prev))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className="app-shell">

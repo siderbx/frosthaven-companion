@@ -80,7 +80,21 @@ export const CARD_TAGS = [
 
 export type CardTag = (typeof CARD_TAGS)[number]
 
-export type ActionCardStatus = 'reserve' | 'hand' | 'used' | 'lost'
+export type ActionCardStatus = 'reserve' | 'hand' | 'used' | 'lost' | 'active'
+
+/**
+ * A persistent effect printed on one half of a card: played to the active area
+ * instead of discard/lost, tracked with use slots, and moved to its final pile
+ * only when the track is exhausted (or the scenario ends).
+ */
+export interface PersistentEffect {
+  /** Number of use slots on the track; null = lasts the whole scenario (no slots). */
+  charges: number | null
+  /** Which pile the card goes to when the effect ends. */
+  endsIn: 'used' | 'lost'
+  /** Reminder of what each charge does / when XP is earned. */
+  note?: string
+}
 
 export interface ActionCard {
   id: string
@@ -93,6 +107,10 @@ export interface ActionCard {
   bottomLoss: boolean
   tags: CardTag[]
   status: ActionCardStatus
+  /** Remaining charges while status is 'active'; null = whole-scenario effect. */
+  activeCharges?: number | null
+  /** Which half's persistent effect is active while status is 'active'. */
+  activeHalf?: 'top' | 'bottom'
 }
 
 export type RoundSelection = {
