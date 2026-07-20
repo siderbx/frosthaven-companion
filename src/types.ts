@@ -21,6 +21,17 @@ export interface Perk {
   picks: PerkPickSource[]
 }
 
+/**
+ * A mastery goal from the character mat. Text isn't hardcoded (see voidwardenPerks.ts
+ * header for why) — the user fills it in from their physical mat and checks it off
+ * once earned in a won scenario.
+ */
+export interface Mastery {
+  id: string
+  text: string
+  achieved: boolean
+}
+
 export interface ModifierCardType {
   id: string
   label: string

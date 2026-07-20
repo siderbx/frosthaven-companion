@@ -64,6 +64,12 @@
   padding: 20px;
 }
 
+.panel-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .panel-header {
   display: flex;
   justify-content: space-between;

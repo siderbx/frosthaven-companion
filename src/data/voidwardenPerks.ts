@@ -11,7 +11,7 @@ export const VOIDWARDEN_PERKS: Array<{ label: string; timesAvailable: number }> 
   { label: 'Remove one −2 card', timesAvailable: 1 },
   { label: 'Replace one −1 card with one +1 "Heal 1, Shield 1 ally" card', timesAvailable: 2 },
   { label: 'Replace one +0 card with one +1 "Heal 1, Shield 1 ally" card', timesAvailable: 3 },
-  { label: 'Replace one +0 card with one +1 Dark card', timesAvailable: 1 },
+  { label: 'Replace one +0 card with one +1 Poison card', timesAvailable: 1 },
   { label: 'Replace one +0 card with one +1 Frost card', timesAvailable: 2 },
   { label: 'Add two +1 Frost cards', timesAvailable: 1 },
   { label: 'Add two +1 Dark cards', timesAvailable: 1 },

@@ -2,13 +2,15 @@ import { useState } from 'react'
 import './App.css'
 import { CharacterSheet } from './components/CharacterSheet'
 import { PerkList } from './components/PerkList'
+import { MasteryList } from './components/MasteryList'
 import { ModifierDeck } from './components/ModifierDeck'
 import { ActionCards } from './components/ActionCards'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { freshDeck, defaultComposition } from './lib/modifierDeck'
 import { VOIDWARDEN_HP_BY_LEVEL, buildVoidwardenActionCards } from './data/voidwarden'
 import { VOIDWARDEN_PERKS } from './data/voidwardenPerks'
-import type { ActionCard, CharacterState, ModifierDeckState, Perk } from './types'
+import { VOIDWARDEN_MASTERIES } from './data/voidwardenMasteries'
+import type { ActionCard, CharacterState, Mastery, ModifierDeckState, Perk } from './types'
 
 const TABS = ['Character', 'Perks', 'Modifier Deck', 'Action Cards'] as const
 type Tab = (typeof TABS)[number]
@@ -33,10 +35,17 @@ const seededPerks: Perk[] = VOIDWARDEN_PERKS.map((p) => ({
 
 const seededCards: ActionCard[] = buildVoidwardenActionCards()
 
+const seededMasteries: Mastery[] = VOIDWARDEN_MASTERIES.map((text) => ({
+  id: crypto.randomUUID(),
+  text,
+  achieved: false,
+}))
+
 function App() {
   const [tab, setTab] = useState<Tab>('Character')
   const [character, setCharacter] = useLocalStorage<CharacterState>('fh-character', defaultCharacter)
   const [perks, setPerks] = useLocalStorage<Perk[]>('fh-perks', seededPerks)
+  const [masteries, setMasteries] = useLocalStorage<Mastery[]>('fh-masteries', seededMasteries)
   const [deck, setDeck] = useLocalStorage<ModifierDeckState>('fh-deck', freshDeck(defaultComposition()))
   const [cards, setCards] = useLocalStorage<ActionCard[]>('fh-cards', seededCards)
 
@@ -58,7 +67,10 @@ function App() {
       <main className="app-main">
         {tab === 'Character' && <CharacterSheet character={character} onChange={setCharacter} />}
         {tab === 'Perks' && (
-          <PerkList perks={perks} onChange={setPerks} character={character} onCharacterChange={setCharacter} />
+          <div className="panel-stack">
+            <PerkList perks={perks} onChange={setPerks} character={character} onCharacterChange={setCharacter} />
+            <MasteryList masteries={masteries} onChange={setMasteries} />
+          </div>
         )}
         {tab === 'Modifier Deck' && <ModifierDeck deck={deck} onChange={setDeck} />}
         {tab === 'Action Cards' && <ActionCards cards={cards} onChange={setCards} />}
