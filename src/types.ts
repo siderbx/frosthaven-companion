@@ -1,3 +1,18 @@
+/** The 9 gatherable crafting resources shown on every character mat, in the mat's grid order. */
+export const RESOURCE_TYPES = [
+  'Lumber',
+  'Metal',
+  'Hide',
+  'Arrowvine',
+  'Axenut',
+  'Corpsecap',
+  'Flamefruit',
+  'Rockroot',
+  'Snowthistle',
+] as const
+
+export type ResourceType = (typeof RESOURCE_TYPES)[number]
+
 export interface CharacterState {
   name: string
   className: string
@@ -8,6 +23,8 @@ export interface CharacterState {
   currentHp: number
   /** Battle Goal checkmarks earned — every 3 grants one perk pick (up to 6 perk picks this way) */
   battleGoalCheckmarks: number
+  /** How many of each crafting resource the character has collected. */
+  resources: Record<ResourceType, number>
 }
 
 export type PerkPickSource = 'level' | 'points'

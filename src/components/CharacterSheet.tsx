@@ -2,6 +2,7 @@ import type { Dispatch, SetStateAction } from 'react'
 import { VOIDWARDEN_HP_BY_LEVEL, VOIDWARDEN_KEYWORDS, VOIDWARDEN_XP_BY_LEVEL } from '../data/voidwarden'
 import type { CharacterState } from '../types'
 import { Counter } from './Counter'
+import { ResourceTracker } from './ResourceTracker'
 
 interface CharacterSheetProps {
   character: CharacterState
@@ -36,10 +37,16 @@ export function CharacterSheet({ character, onChange }: CharacterSheetProps) {
           value={character.name}
           onChange={(e) => set('name', e.target.value)}
         />
-        <span className="class-tag">
-          {character.className}
-          <span className="keyword-list"> · {VOIDWARDEN_KEYWORDS.join(' · ')}</span>
-        </span>
+        <div className="class-line">
+          <span className="class-tag">{character.className}</span>
+          <span className="keyword-chips">
+            {VOIDWARDEN_KEYWORDS.map((kw) => (
+              <span key={kw} className="keyword-chip">
+                {kw}
+              </span>
+            ))}
+          </span>
+        </div>
       </div>
 
       <div className="hp-block">
@@ -94,6 +101,8 @@ export function CharacterSheet({ character, onChange }: CharacterSheetProps) {
           </p>
         </div>
       </div>
+
+      <ResourceTracker character={character} onChange={onChange} />
     </div>
   )
 }

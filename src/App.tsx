@@ -10,10 +10,13 @@ import { freshDeck, defaultComposition } from './lib/modifierDeck'
 import { VOIDWARDEN_HP_BY_LEVEL, buildVoidwardenActionCards } from './data/voidwarden'
 import { VOIDWARDEN_PERKS } from './data/voidwardenPerks'
 import { VOIDWARDEN_MASTERIES } from './data/voidwardenMasteries'
-import type { ActionCard, CharacterState, Mastery, ModifierDeckState, Perk } from './types'
+import { RESOURCE_TYPES } from './types'
+import type { ActionCard, CharacterState, Mastery, ModifierDeckState, Perk, ResourceType } from './types'
 
 const TABS = ['Character', 'Perks', 'Modifier Deck', 'Action Cards'] as const
 type Tab = (typeof TABS)[number]
+
+const emptyResources = Object.fromEntries(RESOURCE_TYPES.map((r) => [r, 0])) as Record<ResourceType, number>
 
 const defaultCharacter: CharacterState = {
   name: '',
@@ -24,6 +27,7 @@ const defaultCharacter: CharacterState = {
   maxHp: VOIDWARDEN_HP_BY_LEVEL[1],
   currentHp: VOIDWARDEN_HP_BY_LEVEL[1],
   battleGoalCheckmarks: 0,
+  resources: emptyResources,
 }
 
 const seededPerks: Perk[] = VOIDWARDEN_PERKS.map((p) => ({
