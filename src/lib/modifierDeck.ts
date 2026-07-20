@@ -54,7 +54,7 @@ export function drawCard(state: ModifierDeckState): ModifierDeckState {
   if (reshuffle) {
     return {
       ...state,
-      drawPile: shuffle(nextDiscard),
+      drawPile: shuffle([...rest, ...nextDiscard]),
       discardPile: [],
       lastDrawnId: drawnId,
       lastDrawWasReshuffle: true,
