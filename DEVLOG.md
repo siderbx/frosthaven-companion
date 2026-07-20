@@ -61,9 +61,17 @@ _(nothing yet)_
 
 ## Todo
 
-- Fill in top/bottom action text for all 14 cards from the physical cards (currently blank by design).
+- **2026-07-20** User-reported batch, from reviewing the app against the physical materials:
+  - Add the class keywords **Arcane · Educated · Outcast** next to "Human Voidwarden" on the Character tab (from the character mat's Notes section).
+  - Add a **Mastery** section to the Perks page — each character has 2 masteries to achieve. Have partial text from the user's earlier character-mat photo but not confident on the exact condition icons in the second one (see icon-mixup item below) — needs confirmation or should be left editable like Perks/Action Cards.
+  - **Fix wrong perk data**: `voidwardenPerks.ts` has "+1 Dark card" entries, but per the user that's actually a **Poison** symbol, not the Dark element — "Dark card" isn't a real thing in the game. Need to cross-reference the rulebook's icon glossary (condition icons vs. element icons) and correct the perk text. Search further if the existing references don't resolve it.
+  - Add a **Resources** reference to the Character tab — 9 different gatherable resource types shown on the character mat (Frosthaven's crafting resources: Lumber, Metal, Hide, Arrowvine, Axenut, Corpsecap, Flamefruit, Rockroot, Snowthistle).
+  - **Modifier Deck looks broken** — needs investigation, root cause not yet identified.
+  - **Wire Perks into the Modifier Deck**: when a perk that adds/removes/replaces a modifier card is picked, that change should actually apply to the Modifier Deck's composition, not stay as two disconnected tabs.
+  - **Guard against accidental Level changes** — leveling now cascades into HP recalculation (and should cascade into deck/card changes too), so an accidental tap needs to not silently corrode state. Needs a confirm step or similar safeguard.
+  - **Action Cards are missing top/bottom text** — these were left blank by design (see Notes/Decisions below) but the user now wants them filled in from reference material, paraphrased rather than verbatim per the existing copyright approach.
+  - **Level changes should prompt an action-card choice** — user reports that changing level didn't add/offer new action cards. This conflicts with what the rulebook confirmed earlier (all 14 Voidwarden cards, including the 3 "X" ones, are available from level 1 with no per-level gating) — needs clarifying with the user whether this is about something else (e.g. the Modifier Deck perk-cards above) rather than actually reintroducing level-gated action cards.
 - Decide on real-time party-state architecture if/when this needs to sync across multiple players' devices — likely a Durable Object per campaign/session, deferred since the current scope is single-character/single-device.
-- Consider wiring Perks directly into Modifier Deck composition (currently two separate manual steps) once the perk list/deck-effects are entered once and stabilize.
 - Broaden beyond the Voidwarden to other classes/characters if the group wants it on more than one device.
 
 ## Notes / Decisions
