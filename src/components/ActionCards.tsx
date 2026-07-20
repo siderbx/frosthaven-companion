@@ -23,6 +23,7 @@ export function ActionCards({ cards, onChange }: ActionCardsProps) {
   const [topCardId, setTopCardId] = useState<string | null>(null)
   const [bottomCardId, setBottomCardId] = useState<string | null>(null)
   const [restPicker, setRestPicker] = useState<'short' | 'long' | null>(null)
+  const [shortRestLoss, setShortRestLoss] = useState<{ id: string; rerolled: boolean } | null>(null)
 
   const reserve = cards.filter((c) => c.status === 'reserve')
   const hand = cards.filter((c) => c.status === 'hand')
@@ -82,22 +83,42 @@ export function ActionCards({ cards, onChange }: ActionCardsProps) {
     setBottomCardId(null)
   }
 
-  const shortRest = (loseCardId: string | null) => {
+  // Short rest: randomly lose one discarded card. Rulebook p.17.
+  const beginShortRest = () => {
+    if (used.length < 2) return
+    const pick = used[Math.floor(Math.random() * used.length)]
+    setShortRestLoss({ id: pick.id, rerolled: false })
+    setRestPicker('short')
+  }
+
+  // Suffer 1 damage to randomly lose a *different* card instead (once per rest).
+  const rerollShortRest = () => {
+    if (!shortRestLoss || shortRestLoss.rerolled) return
+    const others = used.filter((c) => c.id !== shortRestLoss.id)
+    if (others.length === 0) return
+    const pick = others[Math.floor(Math.random() * others.length)]
+    setShortRestLoss({ id: pick.id, rerolled: true })
+  }
+
+  const confirmShortRest = () => {
+    if (!shortRestLoss) return
+    const loseId = shortRestLoss.id
+    onChange((prev) =>
+      prev.map((c) => {
+        if (c.status !== 'used') return c
+        return c.id === loseId ? { ...c, status: 'lost' } : { ...c, status: 'hand' }
+      }),
+    )
+    setShortRestLoss(null)
+    setRestPicker(null)
+  }
+
+  // Long rest: choose one discarded card to lose, recover the rest. Rulebook p.17.
+  const longRest = (loseCardId: string) => {
     onChange((prev) =>
       prev.map((c) => {
         if (c.status !== 'used') return c
         return c.id === loseCardId ? { ...c, status: 'lost' } : { ...c, status: 'hand' }
-      }),
-    )
-    setRestPicker(null)
-  }
-
-  const longRest = (recoverLostId: string | null) => {
-    onChange((prev) =>
-      prev.map((c) => {
-        if (c.status === 'used') return { ...c, status: 'hand' }
-        if (c.status === 'lost' && c.id === recoverLostId) return { ...c, status: 'hand' }
-        return c
       }),
     )
     setRestPicker(null)
@@ -339,38 +360,42 @@ export function ActionCards({ cards, onChange }: ActionCardsProps) {
           ))}
 
           <div className="rest-actions">
-            <button type="button" className="secondary-btn" disabled={used.length === 0} onClick={() => setRestPicker('short')}>
+            <button type="button" className="secondary-btn" disabled={used.length < 2} onClick={beginShortRest}>
               Short Rest
             </button>
-            <button type="button" className="secondary-btn" disabled={used.length === 0} onClick={() => setRestPicker('long')}>
+            <button type="button" className="secondary-btn" disabled={used.length < 2} onClick={() => setRestPicker('long')}>
               Long Rest
             </button>
           </div>
+          {used.length < 2 && used.length > 0 && (
+            <span className="muted">A rest needs 2+ cards in the discard pile.</span>
+          )}
 
-          {restPicker === 'short' && (
+          {restPicker === 'short' && shortRestLoss && (
             <div className="lost-picker">
-              <span className="muted">If you drew a −1/−2, pick a card to lose instead of taking damage:</span>
+              <span className="muted">
+                Randomly lost: <strong>{cards.find((c) => c.id === shortRestLoss.id)?.name}</strong>. The rest return to your hand.
+              </span>
               <div className="tag-picker">
-                <button type="button" className="tag-chip" onClick={() => shortRest(null)}>
-                  No loss
+                <button type="button" className="tag-chip" onClick={confirmShortRest}>
+                  Confirm
                 </button>
-                {used.map((card) => (
-                  <button type="button" key={card.id} className="tag-chip" onClick={() => shortRest(card.id)}>
-                    {card.name}
+                {!shortRestLoss.rerolled && used.length > 1 && (
+                  <button type="button" className="tag-chip" onClick={rerollShortRest}>
+                    Suffer 1 damage — lose a different card
                   </button>
-                ))}
+                )}
               </div>
             </div>
           )}
 
           {restPicker === 'long' && (
             <div className="lost-picker">
-              <span className="muted">Recover one lost card (optional):</span>
+              <span className="muted">
+                Choose one discarded card to lose (the rest return to hand). Then Heal 2 (Self) and refresh spent items.
+              </span>
               <div className="tag-picker">
-                <button type="button" className="tag-chip" onClick={() => longRest(null)}>
-                  None
-                </button>
-                {lost.map((card) => (
+                {used.map((card) => (
                   <button type="button" key={card.id} className="tag-chip" onClick={() => longRest(card.id)}>
                     {card.name}
                   </button>
