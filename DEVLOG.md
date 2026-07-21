@@ -78,7 +78,7 @@ _(nothing yet)_
 ## Todo
 
 - **2026-07-20** User-reported batch, from reviewing the app against the physical materials:
-  - Add the class keywords **Arcane · Educated · Outcast** next to "Human Voidwarden" on the Character tab (from the character mat's Notes section).
+  - ~~Add the class keywords **Arcane · Educated · Outcast** next to "Human Voidwarden" on the Character tab~~ — done, see Done section (rendered as pill chips from the mat's Notes section).
   - ~~Add a **Mastery** section to the Perks page~~ — done, see Done section. Text is seeded from the mat photo now, but Mastery 2 still has **3 unconfirmed condition icons** (`[icon N unconfirmed]` placeholders) that need the user to identify before it's fully accurate.
   - ~~**Fix wrong perk data**~~ — done, see Done section (confirmed Poison via the mat photo, fixed `voidwardenPerks.ts`).
   - ~~Add a **Resources** reference to the Character tab~~ — done, see Done section. Counter per resource for all 9 crafting resources with a collected total.
