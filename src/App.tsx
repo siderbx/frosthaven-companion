@@ -125,7 +125,13 @@ function App() {
       </nav>
 
       <main className="app-main">
-        {tab === 'Character' && <CharacterSheet character={character} onChange={setCharacter} />}
+        {tab === 'Character' && (
+          <CharacterSheet
+            character={character}
+            onChange={setCharacter}
+            onLevelChange={() => setTab('Action Cards')}
+          />
+        )}
         {tab === 'Perks' && (
           <div className="panel-stack">
             <PerkList perks={perks} onChange={setPerks} character={character} onCharacterChange={setCharacter} />
@@ -133,7 +139,9 @@ function App() {
           </div>
         )}
         {tab === 'Modifier Deck' && <ModifierDeck deck={deck} onChange={setDeck} />}
-        {tab === 'Action Cards' && <ActionCards cards={cards} onChange={setCards} />}
+        {tab === 'Action Cards' && (
+          <ActionCards cards={cards} onChange={setCards} characterLevel={character.level} />
+        )}
       </main>
     </div>
   )

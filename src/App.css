@@ -435,6 +435,61 @@
   padding-top: 8px;
 }
 
+.level-confirm {
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+/* Level-up card pick / over-cap remover */
+
+.level-pick-panel {
+  margin: 4px 0 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 10%, var(--panel-bg));
+}
+
+.level-pick-panel.over-cap {
+  border-color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 10%, var(--panel-bg));
+}
+
+.level-pick-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.level-pick-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.level-pick-card {
+  background: var(--panel-bg);
+}
+
+.lvl-badge {
+  background: var(--border);
+  color: var(--text-h);
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 2px 8px;
+  font-size: 13px;
+}
+
+.side-static {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  font-size: 14px;
+}
+
 .add-row {
   display: flex;
   gap: 8px;

@@ -1,10 +1,12 @@
 import { useMemo, useState, type Dispatch, type SetStateAction } from 'react'
 import { CARD_TAGS, type ActionCard, type CardTag } from '../types'
-import { persistentEffectFor } from '../data/voidwarden'
+import { persistentEffectFor, VOIDWARDEN_CARD_DETAILS, voidwardenActionCardFrom } from '../data/voidwarden'
 
 interface ActionCardsProps {
   cards: ActionCard[]
   onChange: Dispatch<SetStateAction<ActionCard[]>>
+  /** Character's current level — drives the level-up card pick (one add per level 2–9). */
+  characterLevel: number
 }
 
 const emptyDraft = {
@@ -18,7 +20,7 @@ const emptyDraft = {
   tags: [] as CardTag[],
 }
 
-export function ActionCards({ cards, onChange }: ActionCardsProps) {
+export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProps) {
   const [showAdd, setShowAdd] = useState(cards.length === 0)
   const [draft, setDraft] = useState(emptyDraft)
   const [topCardId, setTopCardId] = useState<string | null>(null)
@@ -27,12 +29,38 @@ export function ActionCards({ cards, onChange }: ActionCardsProps) {
   const [pickOrder, setPickOrder] = useState<string[]>([])
   const [restPicker, setRestPicker] = useState<'short' | 'long' | null>(null)
   const [shortRestLoss, setShortRestLoss] = useState<{ id: string; rerolled: boolean } | null>(null)
+  const [chooserCollapsed, setChooserCollapsed] = useState(false)
+  const [pendingRemoveId, setPendingRemoveId] = useState<string | null>(null)
 
   const reserve = cards.filter((c) => c.status === 'reserve')
   const hand = cards.filter((c) => c.status === 'hand')
   const used = cards.filter((c) => c.status === 'used')
   const lost = cards.filter((c) => c.status === 'lost')
   const active = cards.filter((c) => c.status === 'active')
+
+  // Level-up card picks. Each level from 2 to current grants one card add, so the
+  // number owed is (levels gained) minus (leveled cards already owned). Derived,
+  // not stored — it self-corrects as cards are added/removed or level changes.
+  const ownedNames = useMemo(() => new Set(cards.map((c) => c.name.trim().toLowerCase())), [cards])
+  const leveledOwned = cards.filter((c) => c.level >= 2)
+  const owedPicks = Math.max(0, characterLevel - 1) - leveledOwned.length
+  const availableLevelCards = useMemo(
+    () =>
+      VOIDWARDEN_CARD_DETAILS.filter(
+        (d) => d.level >= 2 && d.level <= characterLevel && !ownedNames.has(d.name.toLowerCase()),
+      ).sort((a, b) => a.level - b.level || a.initiative - b.initiative),
+    [ownedNames, characterLevel],
+  )
+
+  const addLevelCard = (name: string) => {
+    const detail = VOIDWARDEN_CARD_DETAILS.find((d) => d.name === name)
+    if (detail) onChange((prev) => [...prev, voidwardenActionCardFrom(detail, 'reserve')])
+  }
+
+  const confirmRemoveLeveled = (id: string) => {
+    onChange((prev) => prev.filter((c) => c.id !== id))
+    setPendingRemoveId(null)
+  }
 
   const topCard = cards.find((c) => c.id === topCardId) ?? null
   const bottomCard = cards.find((c) => c.id === bottomCardId) ?? null
@@ -208,6 +236,98 @@ export function ActionCards({ cards, onChange }: ActionCardsProps) {
           {showAdd ? 'Cancel' : '+ Add card'}
         </button>
       </div>
+
+      {owedPicks > 0 && (
+        <div className="level-pick-panel">
+          <div className="level-pick-head">
+            <strong>
+              Level-up card pick{owedPicks > 1 ? `s — ${owedPicks} to choose` : ''}
+            </strong>
+            <button type="button" className="link-btn" onClick={() => setChooserCollapsed((v) => !v)}>
+              {chooserCollapsed ? 'Choose now' : 'Choose later'}
+            </button>
+          </div>
+          {!chooserCollapsed && (
+            <>
+              <p className="field-hint">
+                Leveling up lets you add one card to your pool — pick from your new level's cards or a
+                lower-level card you skipped. Added cards go to Reserve; swap them into your hand of 11 as you like.
+              </p>
+              {availableLevelCards.length === 0 ? (
+                <p className="field-hint">No cards left to add at your current level.</p>
+              ) : (
+                <div className="level-pick-list">
+                  {availableLevelCards.map((d) => (
+                    <div key={d.name} className="action-card level-pick-card">
+                      <div className="action-card-head">
+                        <strong>{d.name}</strong>
+                        <span className="head-right">
+                          <span className="lvl-badge">L{d.level}</span>
+                          <span className="init-badge">{d.initiative}</span>
+                          <button
+                            type="button"
+                            className="secondary-btn small"
+                            onClick={() => addLevelCard(d.name)}
+                          >
+                            Add
+                          </button>
+                        </span>
+                      </div>
+                      <div className="action-card-body">
+                        <span className="side-static">
+                          Top{d.topLoss ? ' 🔥' : ''}: {d.topText}
+                        </span>
+                        <span className="side-static">
+                          Bottom{d.bottomLoss ? ' 🔥' : ''}: {d.bottomText}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {owedPicks < 0 && (
+        <div className="level-pick-panel over-cap">
+          <div className="level-pick-head">
+            <strong>Level down — more cards than your level allows</strong>
+          </div>
+          <p className="field-hint">
+            You have {-owedPicks} leveled card{-owedPicks > 1 ? 's' : ''} beyond what level {characterLevel}{' '}
+            grants. Remove one to hand the pick back — or keep it if you're mid-scenario and sorting it out later.
+          </p>
+          <div className="level-pick-list">
+            {leveledOwned.map((card) => (
+              <div key={card.id} className="action-card compact reserve-row">
+                <span>
+                  {card.name} <span className="muted">(L{card.level} · {card.initiative})</span>
+                </span>
+                {pendingRemoveId === card.id ? (
+                  <span className="head-right">
+                    <button
+                      type="button"
+                      className="secondary-btn small"
+                      onClick={() => confirmRemoveLeveled(card.id)}
+                    >
+                      Remove
+                    </button>
+                    <button type="button" className="link-btn small" onClick={() => setPendingRemoveId(null)}>
+                      Cancel
+                    </button>
+                  </span>
+                ) : (
+                  <button type="button" className="link-btn small" onClick={() => setPendingRemoveId(card.id)}>
+                    Remove
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {cards.length === 0 && !showAdd && (
         <p className="empty-hint">
@@ -443,7 +563,7 @@ export function ActionCards({ cards, onChange }: ActionCardsProps) {
           {reserve.length > 0 && (
             <>
               <h3>Reserve ({reserve.length})</h3>
-              <p className="field-hint">All 14 cards are available from level 1 — these are just the ones not currently in your hand of 11.</p>
+              <p className="field-hint">Cards not currently in your hand of 11 — your 3 starting "X" cards plus any level-up cards you've added.</p>
               {reserve.map((card) => (
                 <div key={card.id} className="action-card compact reserve-row">
                   <span>
