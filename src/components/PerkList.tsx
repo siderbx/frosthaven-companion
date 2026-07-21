@@ -1,5 +1,6 @@
 import { useState, type Dispatch, type SetStateAction } from 'react'
 import type { CharacterState, Perk, PerkPickSource } from '../types'
+import { CardText } from './CardText'
 
 const POINTS_PER_PICK = 3
 
@@ -70,7 +71,9 @@ export function PerkList({ perks, onChange, character, onCharacterChange }: Perk
         {perks.map((perk) => (
           <li key={perk.id} className={`perk-row ${perk.picks.length >= perk.timesAvailable ? 'checked' : ''}`}>
             <div className="perk-main">
-              <span className="perk-label">{perk.label}</span>
+              <span className="perk-label">
+                <CardText text={perk.label} />
+              </span>
               <div className="perk-boxes">
                 {Array.from({ length: perk.timesAvailable }).map((_, i) => {
                   const source = perk.picks[i]

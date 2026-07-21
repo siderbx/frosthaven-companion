@@ -1,5 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react'
 import type { Mastery } from '../types'
+import { CardText } from './CardText'
 
 interface MasteryListProps {
   masteries: Mastery[]
@@ -52,6 +53,11 @@ export function MasteryList({ masteries, onChange }: MasteryListProps) {
                 onClick={() => toggleAchieved(mastery.id)}
               />
             </div>
+            {mastery.text.trim() && (
+              <p className="mastery-preview">
+                <CardText text={mastery.text} />
+              </p>
+            )}
             <button type="button" className="remove-btn" onClick={() => remove(mastery.id)} aria-label="Remove mastery">
               ×
             </button>

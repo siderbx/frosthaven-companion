@@ -8,8 +8,8 @@ import { ActionCards } from './components/ActionCards'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { freshDeck, defaultComposition, deriveDeckComposition, sameComposition } from './lib/modifierDeck'
 import { VOIDWARDEN_HP_BY_LEVEL, buildVoidwardenActionCards, withVoidwardenCardText } from './data/voidwarden'
-import { VOIDWARDEN_PERKS, deckEffectsFromPerks } from './data/voidwardenPerks'
-import { VOIDWARDEN_MASTERIES } from './data/voidwardenMasteries'
+import { VOIDWARDEN_PERKS, deckEffectsFromPerks, withVoidwardenPerkFixes } from './data/voidwardenPerks'
+import { VOIDWARDEN_MASTERIES, withVoidwardenMasteryFixes } from './data/voidwardenMasteries'
 import { RESOURCE_TYPES } from './types'
 import type { ActionCard, CharacterState, Mastery, ModifierDeckState, Perk, ResourceType } from './types'
 
@@ -91,10 +91,15 @@ function App() {
   const [deck, setDeck] = useLocalStorage<ModifierDeckState>('fh-deck', freshDeck(defaultComposition()), sanitizeDeck)
   const [cards, setCards] = useLocalStorage<ActionCard[]>('fh-cards', seededCards, sanitizeCards)
 
-  // One-time fill of canonical card text onto cards stored before the text
-  // existed. Only blank fields are touched, so it's a no-op once applied.
+  // One-time data fix-ups for content stored before a correction landed. Each is
+  // idempotent (no-op once applied): card text fills only blank fields; the perk
+  // and mastery fixes rename only exact stale labels/placeholders, so picks,
+  // achieved flags, and any user edits survive. The perk rename also re-drives
+  // the modifier deck via the effect below (deck is derived from perk labels).
   useEffect(() => {
     setCards((prev) => withVoidwardenCardText(prev))
+    setPerks((prev) => withVoidwardenPerkFixes(prev))
+    setMasteries((prev) => withVoidwardenMasteryFixes(prev))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

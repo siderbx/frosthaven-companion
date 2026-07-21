@@ -281,7 +281,7 @@ export const VOIDWARDEN_CARD_DETAILS: VoidwardenCardDetail[] = [
     topText:
       'At the start of your next five turns, one ally within range 3 may perform an "Attack 2" action (XP on the 3rd and 5th; card lost when the track ends).',
     bottomText:
-      'Move 4, then Curse yourself (Consume Fire: skip the self-Curse). Then one ally within range 3 may Move 3.',
+      'Move 4, then Curse yourself (Consume Dark: skip the self-Curse). Then one ally within range 3 may Move 3.',
     topLoss: true,
     bottomLoss: false,
     tags: ['Buff', 'Move'],
@@ -372,7 +372,7 @@ export const VOIDWARDEN_CARD_DETAILS: VoidwardenCardDetail[] = [
     topText:
       'Two allies within range 2 may each suffer 2 damage; each ally who does may Attack 6 at range 3. +2 XP.',
     bottomText:
-      'Curse yourself (Consume Fire: skip the self-Curse). Then Curse at range 4, Target 2.',
+      'Curse yourself (Consume Dark: skip the self-Curse). Then Curse at range 4, Target 2.',
     topLoss: true,
     bottomLoss: false,
     tags: ['Buff', 'Attack', 'Control'],
@@ -382,9 +382,9 @@ export const VOIDWARDEN_CARD_DETAILS: VoidwardenCardDetail[] = [
     name: 'Hateful Blast',
     level: 7,
     initiative: 29,
-    topText: 'Attack 5 at range 3 with Muddle. Consume Fire: also Wound. +1 XP.',
+    topText: 'Attack 5 at range 3 with Muddle. Consume Dark: also Wound. +1 XP.',
     bottomText:
-      'Force one enemy within range 3 to Attack 2 at range 2 with Wound (Consume Fire: +1 range), targeting three enemies of your choice. +2 XP.',
+      'Force one enemy within range 3 to Attack 2 at range 2 with Wound (Consume Dark: +1 range), targeting three enemies of your choice. +2 XP.',
     topLoss: false,
     bottomLoss: true,
     tags: ['Attack', 'Control'],
@@ -426,7 +426,7 @@ export const VOIDWARDEN_CARD_DETAILS: VoidwardenCardDetail[] = [
     topText:
       'Stun and Curse at range 3, Target 2. If this card is discarded before the end of the round, or either target suffers damage this round, both targets lose Stun. Infuse Dark.',
     bottomText:
-      'You and all allies within range 2 may Move 3 (Consume Fire: +1 Move). +1 XP.',
+      'You and all allies within range 2 may Move 3 (Consume Dark: +1 Move). +1 XP.',
     topLoss: false,
     bottomLoss: false,
     tags: ['Control', 'Move'],
@@ -437,7 +437,7 @@ export const VOIDWARDEN_CARD_DETAILS: VoidwardenCardDetail[] = [
     level: 9,
     initiative: 66,
     topText:
-      'Attack 2 at range 2, Target 3, with Poison and Wound. Consume Fire: also Curse. +1 XP.',
+      'Attack 2 at range 2, Target 3, with Poison and Wound. Consume Dark: also Curse. +1 XP.',
     bottomText:
       'One ally within range 3 may Attack 8 at range 3 (Consume Ice: also Stun, +1 XP); if they do, gain +1 XP and that ally gains Poison.',
     topLoss: false,

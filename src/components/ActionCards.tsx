@@ -1,6 +1,8 @@
 import { useMemo, useState, type Dispatch, type SetStateAction } from 'react'
-import { CARD_TAGS, type ActionCard, type CardTag } from '../types'
+import type { ActionCard } from '../types'
 import { persistentEffectFor, VOIDWARDEN_CARD_DETAILS, voidwardenActionCardFrom } from '../data/voidwarden'
+import { CardText } from './CardText'
+import { LOSS_ICON } from '../lib/gameIcons'
 
 interface ActionCardsProps {
   cards: ActionCard[]
@@ -9,20 +11,8 @@ interface ActionCardsProps {
   characterLevel: number
 }
 
-const emptyDraft = {
-  name: '',
-  level: 1,
-  initiative: 30,
-  topText: '',
-  bottomText: '',
-  topLoss: false,
-  bottomLoss: false,
-  tags: [] as CardTag[],
-}
-
 export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProps) {
-  const [showAdd, setShowAdd] = useState(cards.length === 0)
-  const [draft, setDraft] = useState(emptyDraft)
+  const [showAdd, setShowAdd] = useState(false)
   const [topCardId, setTopCardId] = useState<string | null>(null)
   const [bottomCardId, setBottomCardId] = useState<string | null>(null)
   /** Selected card ids in the order they were picked — the first is the leading card. */
@@ -52,7 +42,21 @@ export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProp
     [ownedNames, characterLevel],
   )
 
-  const addLevelCard = (name: string) => {
+  // Every real card you could add right now via "+ Add card": any Voidwarden card
+  // unlocked at your level (1..current) that you don't already own. This is a
+  // superset of the level-up chooser's list — it also lets you re-add a level-1
+  // card you removed by mistake. Adds are constrained to the real card pool, so
+  // no arbitrary typed-in cards.
+  const addableCards = useMemo(
+    () =>
+      VOIDWARDEN_CARD_DETAILS.filter(
+        (d) => d.level <= characterLevel && !ownedNames.has(d.name.toLowerCase()),
+      ).sort((a, b) => a.level - b.level || a.initiative - b.initiative),
+    [ownedNames, characterLevel],
+  )
+
+  // Instantiate a catalog card into Reserve (swap into hand from there as wanted).
+  const addFromCatalog = (name: string) => {
     const detail = VOIDWARDEN_CARD_DETAILS.find((d) => d.name === name)
     if (detail) onChange((prev) => [...prev, voidwardenActionCardFrom(detail, 'reserve')])
   }
@@ -92,27 +96,6 @@ export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProp
     setPickOrder([])
   }
 
-  const addCard = () => {
-    if (!draft.name.trim()) return
-    onChange((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        name: draft.name.trim(),
-        level: draft.level,
-        initiative: draft.initiative,
-        topText: draft.topText.trim(),
-        bottomText: draft.bottomText.trim(),
-        topLoss: draft.topLoss,
-        bottomLoss: draft.bottomLoss,
-        tags: draft.tags,
-        status: 'hand',
-      },
-    ])
-    setDraft(emptyDraft)
-    setShowAdd(false)
-  }
-
   const removeCard = (id: string) => onChange((prev) => prev.filter((c) => c.id !== id))
 
   const moveToHand = (id: string) =>
@@ -120,12 +103,6 @@ export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProp
 
   const moveToReserve = (id: string) =>
     onChange((prev) => prev.map((c) => (c.id === id ? { ...c, status: 'reserve' } : c)))
-
-  const toggleTag = (tag: CardTag) =>
-    setDraft((d) => ({
-      ...d,
-      tags: d.tags.includes(tag) ? d.tags.filter((t) => t !== tag) : [...d.tags, tag],
-    }))
 
   // Where a played card goes: persistent halves enter the active area with
   // their use-slot track; everything else discards (or is lost) immediately.
@@ -267,7 +244,7 @@ export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProp
                           <button
                             type="button"
                             className="secondary-btn small"
-                            onClick={() => addLevelCard(d.name)}
+                            onClick={() => addFromCatalog(d.name)}
                           >
                             Add
                           </button>
@@ -331,89 +308,51 @@ export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProp
 
       {cards.length === 0 && !showAdd && (
         <p className="empty-hint">
-          Add your 11 Human Voidwarden cards from your hand — name, initiative, and top/bottom actions —
-          to track them and get pairing suggestions.
+          Your 14 starting Human Voidwarden cards seed automatically. Use <strong>+ Add card</strong> to
+          pull any real card from the class pool if you're missing one.
         </p>
       )}
 
       {showAdd && (
-        <form
-          className="card-form"
-          onSubmit={(e) => {
-            e.preventDefault()
-            addCard()
-          }}
-        >
-          <div className="card-form-row">
-            <input
-              className="text-input"
-              placeholder="Card name"
-              value={draft.name}
-              onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
-            />
-            <input
-              className="text-input tiny"
-              type="number"
-              placeholder="Lvl"
-              value={draft.level}
-              onChange={(e) => setDraft((d) => ({ ...d, level: Number(e.target.value) }))}
-            />
-            <input
-              className="text-input tiny"
-              type="number"
-              placeholder="Init."
-              value={draft.initiative}
-              onChange={(e) => setDraft((d) => ({ ...d, initiative: Number(e.target.value) }))}
-            />
-          </div>
-          <div className="card-form-row">
-            <input
-              className="text-input"
-              placeholder="Top action"
-              value={draft.topText}
-              onChange={(e) => setDraft((d) => ({ ...d, topText: e.target.value }))}
-            />
-            <label className="loss-toggle">
-              <input
-                type="checkbox"
-                checked={draft.topLoss}
-                onChange={(e) => setDraft((d) => ({ ...d, topLoss: e.target.checked }))}
-              />
-              loss
-            </label>
-          </div>
-          <div className="card-form-row">
-            <input
-              className="text-input"
-              placeholder="Bottom action"
-              value={draft.bottomText}
-              onChange={(e) => setDraft((d) => ({ ...d, bottomText: e.target.value }))}
-            />
-            <label className="loss-toggle">
-              <input
-                type="checkbox"
-                checked={draft.bottomLoss}
-                onChange={(e) => setDraft((d) => ({ ...d, bottomLoss: e.target.checked }))}
-              />
-              loss
-            </label>
-          </div>
-          <div className="tag-picker">
-            {CARD_TAGS.map((tag) => (
-              <button
-                type="button"
-                key={tag}
-                className={`tag-chip ${draft.tags.includes(tag) ? 'active' : ''}`}
-                onClick={() => toggleTag(tag)}
-              >
-                {tag}
-              </button>
-            ))}
-          </div>
-          <button type="submit" className="primary-btn">
-            Save card
-          </button>
-        </form>
+        <div className="add-card-picker">
+          <p className="field-hint">
+            Add a card from the Human Voidwarden pool — only cards unlocked at your level (
+            {characterLevel}) that you don't already own are shown. Added cards go to Reserve; swap them
+            into your hand of 11 as you like.
+          </p>
+          {addableCards.length === 0 ? (
+            <p className="field-hint">You already own every card available at level {characterLevel}.</p>
+          ) : (
+            <div className="level-pick-list">
+              {addableCards.map((d) => (
+                <div key={d.name} className="action-card level-pick-card">
+                  <div className="action-card-head">
+                    <strong>{d.name}</strong>
+                    <span className="head-right">
+                      <span className="lvl-badge">L{d.level}</span>
+                      <span className="init-badge">{d.initiative}</span>
+                      <button
+                        type="button"
+                        className="secondary-btn small"
+                        onClick={() => addFromCatalog(d.name)}
+                      >
+                        Add
+                      </button>
+                    </span>
+                  </div>
+                  <div className="action-card-body">
+                    <span className="side-static">
+                      Top{d.topLoss ? ` ${LOSS_ICON}` : ''}: <CardText text={d.topText} />
+                    </span>
+                    <span className="side-static">
+                      Bottom{d.bottomLoss ? ` ${LOSS_ICON}` : ''}: <CardText text={d.bottomText} />
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       )}
 
       {(topCard || bottomCard) && (
@@ -480,8 +419,14 @@ export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProp
                     </button>
                   </span>
                 </div>
-                <p className="active-effect-text">{half === 'top' ? card.topText : card.bottomText}</p>
-                {persist?.note && <p className="field-hint">{persist.note}</p>}
+                <p className="active-effect-text">
+                  <CardText text={half === 'top' ? card.topText : card.bottomText} />
+                </p>
+                {persist?.note && (
+                  <p className="field-hint">
+                    <CardText text={persist.note} />
+                  </p>
+                )}
                 {total !== null && remaining !== null ? (
                   <div className="charge-row">
                     <span className="charge-pips" aria-label={`${remaining} of ${total} charges left`}>
@@ -544,7 +489,8 @@ export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProp
                     disabled={bottomCardId === card.id}
                     onClick={() => pickSlot('top', card.id)}
                   >
-                    Top{card.topLoss ? ' 🔥' : ''}: {card.topText || '—'}
+                    Top{card.topLoss ? ` ${LOSS_ICON}` : ''}:{' '}
+                    {card.topText ? <CardText text={card.topText} /> : '—'}
                   </button>
                   <button
                     type="button"
@@ -552,7 +498,8 @@ export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProp
                     disabled={topCardId === card.id}
                     onClick={() => pickSlot('bottom', card.id)}
                   >
-                    Bottom{card.bottomLoss ? ' 🔥' : ''}: {card.bottomText || '—'}
+                    Bottom{card.bottomLoss ? ` ${LOSS_ICON}` : ''}:{' '}
+                    {card.bottomText ? <CardText text={card.bottomText} /> : '—'}
                   </button>
                 </div>
               </div>

@@ -621,29 +621,39 @@
   color: var(--text-h);
 }
 
+/* Inline game-term glyphs (rendered by CardText). The word stays next to its
+   parchment glyph tile and the two never wrap apart. */
+.game-icon {
+  white-space: nowrap;
+}
+
+.game-icon-img {
+  height: 1.45em;
+  width: 1.45em;
+  object-fit: cover;
+  vertical-align: -0.35em;
+  border-radius: 4px;
+  margin-right: 1px;
+}
+
+/* Read-only decorated preview under an editable mastery input. */
+.mastery-preview {
+  margin: 6px 0 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text);
+  opacity: 0.85;
+}
+
 /* Action cards */
 
-.card-form {
+.add-card-picker {
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 16px 0;
   border-top: 1px solid var(--border);
   margin-bottom: 16px;
-}
-
-.card-form-row {
-  display: flex;
-  gap: 8px;
-}
-
-.loss-toggle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-  font-size: 14px;
-  opacity: 0.85;
 }
 
 .tag-picker {
