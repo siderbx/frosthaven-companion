@@ -57,6 +57,19 @@ export interface ModifierCardType {
   count: number
   /** Cards like the crit (x2) and miss (Null) trigger a reshuffle after being drawn */
   reshuffle: boolean
+  /** True for the special cards a perk adds (not part of the base 20) — surfaced in the deck breakdown. */
+  fromPerk?: boolean
+}
+
+/**
+ * The change one pick of a perk makes to the attack modifier deck. `remove`/`add`
+ * list card-kind ids (base ids like `minus1`/`plus0`, or perk-card-kind ids like
+ * `frost1`), one entry per card affected. A perk with no deck impact (e.g. "Ignore
+ * scenario effects") simply has no entry in the effect table.
+ */
+export interface PerkDeckEffect {
+  remove?: string[]
+  add?: string[]
 }
 
 export interface ModifierDeckState {

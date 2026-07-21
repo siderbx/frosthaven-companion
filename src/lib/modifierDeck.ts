@@ -1,4 +1,4 @@
-import type { ModifierCardType, ModifierDeckState } from '../types'
+import type { ModifierCardType, ModifierDeckState, PerkDeckEffect } from '../types'
 
 /** The standard 20-card base attack modifier deck used across the Gloomhaven family of games. */
 export function defaultComposition(): ModifierCardType[] {
@@ -11,6 +11,65 @@ export function defaultComposition(): ModifierCardType[] {
     { id: 'crit', label: 'Critical', value: 'x2', count: 1, reshuffle: true },
     { id: 'miss', label: 'Miss', value: 'Null', count: 1, reshuffle: true },
   ]
+}
+
+/**
+ * The special modifier cards a perk can add, beyond the base 20. Keyed by the
+ * card-kind id that `PerkDeckEffect.add` references. These draw as their numeric
+ * value in the sim; their added element/effect (Frost, Poison, …) is flavour the
+ * sim doesn't resolve (nor does it model rolling modifiers — a pre-existing
+ * limitation), so they're treated as ordinary non-reshuffle cards.
+ */
+const PERK_CARD_KINDS: Record<string, Omit<ModifierCardType, 'count'>> = {
+  'heal-shield': { id: 'heal-shield', label: '+1 Heal 1 & Shield 1 ally', value: '+1', reshuffle: false, fromPerk: true },
+  poison1: { id: 'poison1', label: '+1 Poison', value: '+1', reshuffle: false, fromPerk: true },
+  frost1: { id: 'frost1', label: '+1 Frost', value: '+1', reshuffle: false, fromPerk: true },
+  dark1: { id: 'dark1', label: '+1 Dark', value: '+1', reshuffle: false, fromPerk: true },
+  plus3: { id: 'plus3', label: 'Plus 3', value: '+3', reshuffle: false, fromPerk: true },
+}
+
+function cardMeta(id: string): Omit<ModifierCardType, 'count'> | undefined {
+  const base = defaultComposition().find((c) => c.id === id)
+  if (base) return base
+  return PERK_CARD_KINDS[id]
+}
+
+/**
+ * Build the deck composition from the base 20 plus the deck effects of every perk
+ * pick the character has taken. This is a pure function of the effects, so the
+ * deck is fully derived — unpicking a perk automatically reverts its change.
+ */
+export function deriveDeckComposition(effects: PerkDeckEffect[]): ModifierCardType[] {
+  const counts = new Map<string, number>()
+  const order: string[] = []
+  for (const c of defaultComposition()) {
+    counts.set(c.id, c.count)
+    order.push(c.id)
+  }
+  for (const eff of effects) {
+    for (const id of eff.remove ?? []) counts.set(id, (counts.get(id) ?? 0) - 1)
+    for (const id of eff.add ?? []) {
+      if (!counts.has(id)) {
+        counts.set(id, 0)
+        order.push(id)
+      }
+      counts.set(id, (counts.get(id) ?? 0) + 1)
+    }
+  }
+  return order
+    .map((id) => {
+      const meta = cardMeta(id)
+      if (!meta) return null
+      return { ...meta, count: Math.max(0, counts.get(id) ?? 0) }
+    })
+    .filter((c): c is ModifierCardType => c !== null && c.count > 0)
+}
+
+/** True when two compositions have the same card kinds at the same counts (order-independent). */
+export function sameComposition(a: ModifierCardType[], b: ModifierCardType[]): boolean {
+  if (a.length !== b.length) return false
+  const countsA = new Map(a.map((c) => [c.id, c.count]))
+  return b.every((c) => countsA.get(c.id) === c.count)
 }
 
 function shuffle<T>(items: T[]): T[] {

@@ -6,9 +6,9 @@ import { MasteryList } from './components/MasteryList'
 import { ModifierDeck } from './components/ModifierDeck'
 import { ActionCards } from './components/ActionCards'
 import { useLocalStorage } from './hooks/useLocalStorage'
-import { freshDeck, defaultComposition } from './lib/modifierDeck'
+import { freshDeck, defaultComposition, deriveDeckComposition, sameComposition } from './lib/modifierDeck'
 import { VOIDWARDEN_HP_BY_LEVEL, buildVoidwardenActionCards, withVoidwardenCardText } from './data/voidwarden'
-import { VOIDWARDEN_PERKS } from './data/voidwardenPerks'
+import { VOIDWARDEN_PERKS, deckEffectsFromPerks } from './data/voidwardenPerks'
 import { VOIDWARDEN_MASTERIES } from './data/voidwardenMasteries'
 import { RESOURCE_TYPES } from './types'
 import type { ActionCard, CharacterState, Mastery, ModifierDeckState, Perk, ResourceType } from './types'
@@ -97,6 +97,17 @@ function App() {
     setCards((prev) => withVoidwardenCardText(prev))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Keep the modifier deck derived from the perks taken: the base 20 plus every
+  // picked perk's deck effect. Whenever that derived composition changes (a perk
+  // picked/unpicked), rebuild a fresh shuffled deck — perks change between
+  // scenarios, so losing an in-progress draw here is expected, not a data loss.
+  // No-op when the composition already matches (draws/reshuffles don't touch it).
+  useEffect(() => {
+    const desired = deriveDeckComposition(deckEffectsFromPerks(perks))
+    setDeck((prev) => (sameComposition(prev.composition, desired) ? prev : freshDeck(desired)))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [perks])
 
   return (
     <div className="app-shell">
