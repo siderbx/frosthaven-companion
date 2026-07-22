@@ -59,6 +59,12 @@ export interface ModifierCardType {
   reshuffle: boolean
   /** True for the special cards a perk adds (not part of the base 20) — surfaced in the deck breakdown. */
   fromPerk?: boolean
+  /**
+   * Extra game-term glyphs the card carries beyond its numeric value — the element or
+   * effect a perk card applies (e.g. `['Poison']`, `['Heal', 'Target']`). Rendered as
+   * small badges on the card face; the terms map through GAME_ICONS.
+   */
+  icons?: string[]
 }
 
 /**

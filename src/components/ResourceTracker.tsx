@@ -1,5 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react'
 import { RESOURCE_TYPES, type CharacterState, type ResourceType } from '../types'
+import { resourceIcon } from '../lib/gameIcons'
 import { Counter } from './Counter'
 
 interface ResourceTrackerProps {
@@ -25,6 +26,7 @@ export function ResourceTracker({ character, onChange }: ResourceTrackerProps) {
           <Counter
             key={resource}
             label={resource}
+            icon={resourceIcon(resource)}
             value={countOf(resource)}
             min={0}
             onChange={(v) => setResource(resource, v)}

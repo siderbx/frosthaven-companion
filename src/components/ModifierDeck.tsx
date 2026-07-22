@@ -1,6 +1,7 @@
 import { useState, type Dispatch, type SetStateAction } from 'react'
 import type { ModifierDeckState } from '../types'
 import { drawCard, shuffleAll, defaultComposition } from '../lib/modifierDeck'
+import { modifierIcon, GAME_ICONS } from '../lib/gameIcons'
 
 interface ModifierDeckProps {
   deck: ModifierDeckState
@@ -13,6 +14,7 @@ export function ModifierDeck({ deck, onChange }: ModifierDeckProps) {
   const [showComposition, setShowComposition] = useState(false)
 
   const lastCard = deck.composition.find((c) => c.id === deck.lastDrawnId)
+  const lastCardIcon = lastCard && modifierIcon(lastCard.value)
   const remaining = deck.drawPile.length
   const inDiscard = deck.discardPile.length
   const totalCards = deck.composition.reduce((sum, c) => sum + c.count, 0)
@@ -34,7 +36,24 @@ export function ModifierDeck({ deck, onChange }: ModifierDeckProps) {
           <div className="deck-stage">
             <button type="button" className="draw-card" onClick={draw}>
               {lastCard ? (
-                <span className={`card-face ${deck.lastDrawWasReshuffle ? 'special' : ''}`}>{lastCard.value}</span>
+                <span className="card-token">
+                  {lastCardIcon ? (
+                    <img
+                      className={`card-face-img ${deck.lastDrawWasReshuffle ? 'special' : ''}`}
+                      src={lastCardIcon}
+                      alt={lastCard.value}
+                    />
+                  ) : (
+                    <span className={`card-face ${deck.lastDrawWasReshuffle ? 'special' : ''}`}>{lastCard.value}</span>
+                  )}
+                  {lastCard.icons && lastCard.icons.length > 0 && (
+                    <span className="card-token-effects">
+                      {lastCard.icons.map((term) => (
+                        <img key={term} className="token-effect" src={GAME_ICONS[term]} alt={term} title={term} />
+                      ))}
+                    </span>
+                  )}
+                </span>
               ) : (
                 <span className="card-face placeholder">Draw</span>
               )}
@@ -63,9 +82,15 @@ export function ModifierDeck({ deck, onChange }: ModifierDeckProps) {
             {deck.composition.map((card) => {
               const base = baseCounts.get(card.id) ?? 0
               const delta = card.count - base
+              const icon = modifierIcon(card.value)
               return (
                 <li key={card.id} className={`deck-comp-row ${card.fromPerk ? 'from-perk' : ''}`}>
-                  <span className="deck-comp-face">{card.value}</span>
+                  <span className="deck-comp-face">
+                    {icon ? <img className="deck-comp-face-img" src={icon} alt={card.value} /> : card.value}
+                    {card.icons?.map((term) => (
+                      <img key={term} className="deck-comp-effect" src={GAME_ICONS[term]} alt={term} title={term} />
+                    ))}
+                  </span>
                   <span className="deck-comp-label">{card.label}</span>
                   {card.fromPerk && <span className="perk-badge">from perk</span>}
                   {!card.fromPerk && delta !== 0 && (

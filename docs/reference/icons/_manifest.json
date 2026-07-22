@@ -1,0 +1,254 @@
+[
+  {
+    "file": "bane.png",
+    "label": "BANE"
+  },
+  {
+    "file": "brittle.png",
+    "label": "BRITTLE"
+  },
+  {
+    "file": "chill.png",
+    "label": "CHILL"
+  },
+  {
+    "file": "curse.png",
+    "label": "CURSE"
+  },
+  {
+    "file": "disarm.png",
+    "label": "DISARM"
+  },
+  {
+    "file": "enfeeble.png",
+    "label": "ENFEEBLE"
+  },
+  {
+    "file": "immobilize.png",
+    "label": "IMMOBILIZE"
+  },
+  {
+    "file": "impair.png",
+    "label": "IMPAIR"
+  },
+  {
+    "file": "muddle.png",
+    "label": "MUDDLE"
+  },
+  {
+    "file": "poison.png",
+    "label": "POISON"
+  },
+  {
+    "file": "rupture.png",
+    "label": "RUPTURE"
+  },
+  {
+    "file": "stun.png",
+    "label": "STUN"
+  },
+  {
+    "file": "wound.png",
+    "label": "WOUND"
+  },
+  {
+    "file": "bless.png",
+    "label": "BLESS"
+  },
+  {
+    "file": "empower.png",
+    "label": "EMPOWER"
+  },
+  {
+    "file": "regenerate.png",
+    "label": "REGENERATE"
+  },
+  {
+    "file": "strengthen.png",
+    "label": "STRENGTHEN"
+  },
+  {
+    "file": "ward.png",
+    "label": "WARD"
+  },
+  {
+    "file": "invisible.png",
+    "label": "INVISIBLE"
+  },
+  {
+    "file": "dodge.png",
+    "label": "DODGE"
+  },
+  {
+    "file": "attack.png",
+    "label": "ATTACK"
+  },
+  {
+    "file": "range.png",
+    "label": "RANGE"
+  },
+  {
+    "file": "target.png",
+    "label": "TARGET"
+  },
+  {
+    "file": "area-of-effect.png",
+    "label": "AREA OF EFFECT"
+  },
+  {
+    "file": "pierce.png",
+    "label": "PIERCE"
+  },
+  {
+    "file": "move.png",
+    "label": "MOVE"
+  },
+  {
+    "file": "jump.png",
+    "label": "JUMP"
+  },
+  {
+    "file": "flying.png",
+    "label": "FLYING"
+  },
+  {
+    "file": "teleport.png",
+    "label": "TELEPORT"
+  },
+  {
+    "file": "attack-2.png",
+    "label": "ATTACK"
+  },
+  {
+    "file": "range-2.png",
+    "label": "RANGE"
+  },
+  {
+    "file": "target-2.png",
+    "label": "TARGET"
+  },
+  {
+    "file": "shield.png",
+    "label": "SHIELD"
+  },
+  {
+    "file": "retaliate.png",
+    "label": "RETALIATE"
+  },
+  {
+    "file": "heal.png",
+    "label": "HEAL"
+  },
+  {
+    "file": "summon.png",
+    "label": "SUMMON"
+  },
+  {
+    "file": "push.png",
+    "label": "PUSH"
+  },
+  {
+    "file": "pull.png",
+    "label": "PULL"
+  },
+  {
+    "file": "lost.png",
+    "label": "LOST"
+  },
+  {
+    "file": "persistent.png",
+    "label": "PERSISTENT"
+  },
+  {
+    "file": "use-slot.png",
+    "label": "USE SLOT"
+  },
+  {
+    "file": "recover.png",
+    "label": "RECOVER"
+  },
+  {
+    "file": "lumber.png",
+    "label": "LUMBER"
+  },
+  {
+    "file": "metal.png",
+    "label": "METAL"
+  },
+  {
+    "file": "hide.png",
+    "label": "HIDE"
+  },
+  {
+    "file": "arrowvine.png",
+    "label": "ARROWVINE"
+  },
+  {
+    "file": "axenut.png",
+    "label": "AXENUT"
+  },
+  {
+    "file": "corpsecap.png",
+    "label": "CORPSECAP"
+  },
+  {
+    "file": "flamefruit.png",
+    "label": "FLAMEFRUIT"
+  },
+  {
+    "file": "rockroot.png",
+    "label": "ROCKROOT"
+  },
+  {
+    "file": "snowthistle.png",
+    "label": "SNOWTHISTLE"
+  },
+  {
+    "file": "lost-2.png",
+    "label": "LOST"
+  },
+  {
+    "file": "persistent-2.png",
+    "label": "PERSISTENT"
+  },
+  {
+    "file": "use-slot-2.png",
+    "label": "USE SLOT"
+  },
+  {
+    "file": "recover-2.png",
+    "label": "RECOVER"
+  },
+  {
+    "file": "loot.png",
+    "label": "LOOT"
+  },
+  {
+    "file": "plus1.png",
+    "label": "+1"
+  },
+  {
+    "file": "plus2.png",
+    "label": "+2"
+  },
+  {
+    "file": "minus1.png",
+    "label": "-1"
+  },
+  {
+    "file": "minus2.png",
+    "label": "-2"
+  },
+  {
+    "file": "multiplier-2x.png",
+    "label": "MULTIPLIER 2x"
+  },
+  {
+    "file": "null.png",
+    "label": "NULL"
+  },
+  {
+    "file": "rolling-modifier.png",
+    "label": "ROLLING MODIFIER"
+  }
+]

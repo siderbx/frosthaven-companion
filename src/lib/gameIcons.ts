@@ -1,5 +1,6 @@
-// Maps Gloomhaven/Frosthaven game terms to the Voidwarden glyph tiles served from
-// public/icons/ (sliced from docs/reference/glyph-lexicon.png — the user's own art).
+// Maps Gloomhaven/Frosthaven game terms to the icon tiles served from public/icons/
+// (sliced from the user's own art — docs/reference/Frosthaven Icons.png and
+// Frosthaven Elements.png; see docs/reference/icons/ for the full staged set).
 // All icon knowledge lives here and in CardText, so the stored card/perk/mastery
 // text stays plain paraphrase and the artwork can be re-sliced or replaced without
 // touching any data.
@@ -55,6 +56,31 @@ const ICON_FILES: Record<string, string> = {
 export const GAME_ICONS: Record<string, string> = Object.fromEntries(
   Object.entries(ICON_FILES).map(([term, file]) => [term, `${ICON_BASE}/${file}.png`]),
 )
+
+/** Public image path for a crafting resource's token. The RESOURCE_TYPES names map
+ *  one-to-one onto the lowercase tile filenames (lumber.png, arrowvine.png, …). */
+export function resourceIcon(name: string): string {
+  return `${ICON_BASE}/${name.toLowerCase()}.png`
+}
+
+// Attack-modifier card face -> tile filename. Keyed by the card's display value so
+// perk cards (which reuse a base value like "+1") get the matching token for free.
+const MODIFIER_ICON_FILES: Record<string, string> = {
+  '+0': 'plus0',
+  '+1': 'plus1',
+  '+2': 'plus2',
+  '+3': 'plus3',
+  '-1': 'minus1',
+  '-2': 'minus2',
+  x2: 'multiplier-2x',
+  Null: 'null',
+}
+
+/** Public image path for a modifier card's token, or undefined when it has no tile. */
+export function modifierIcon(value: string): string | undefined {
+  const file = MODIFIER_ICON_FILES[value]
+  return file ? `${ICON_BASE}/${file}.png` : undefined
+}
 
 // Longest terms first so a multi-word term would win over a prefix (none today,
 // but keeps the regex correct if compound terms are added).

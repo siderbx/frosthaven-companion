@@ -313,7 +313,18 @@
 }
 
 .counter-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 500;
+}
+
+.counter-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  border-radius: 50%;
+  flex: 0 0 auto;
 }
 
 .counter-controls {
@@ -531,6 +542,37 @@
   color: var(--danger);
 }
 
+/* Drawn-card token: the modifier tile fills most of the card face. */
+.card-token {
+  position: relative;
+  display: inline-flex;
+}
+
+.card-face-img {
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+/* Perk cards carry their element/effect glyph(s) as badges over the token's lower-right. */
+.card-token-effects {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  display: flex;
+  gap: 2px;
+}
+
+.token-effect {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: 0 0 0 2px var(--bg);
+}
+
 .card-face.placeholder {
   font-size: 22px;
   opacity: 0.6;
@@ -585,6 +627,32 @@
 
 .deck-comp-row.from-perk .deck-comp-face {
   border-color: var(--accent);
+}
+
+/* When the face holds a token image, drop the text box chrome around it. */
+.deck-comp-face:has(.deck-comp-face-img) {
+  border: none;
+  padding: 0;
+  min-width: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.deck-comp-face-img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  vertical-align: middle;
+  border-radius: 50%;
+}
+
+/* Element/effect glyphs on a perk card's composition row, beside its value token. */
+.deck-comp-effect {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  border-radius: 50%;
 }
 
 .deck-comp-label {

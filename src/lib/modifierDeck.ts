@@ -23,12 +23,12 @@ export function defaultComposition(): ModifierCardType[] {
 const PERK_CARD_KINDS: Record<string, Omit<ModifierCardType, 'count'>> = {
   // The two "Heal 1, Target 1 ally" perk cards differ by their base value: the
   // −1→ replacement is a +0 card, the +0→ replacement is a +1 card (per the mat).
-  'heal-target0': { id: 'heal-target0', label: '+0 Heal 1, Target 1 ally', value: '+0', reshuffle: false, fromPerk: true },
-  'heal-target1': { id: 'heal-target1', label: '+1 Heal 1, Target 1 ally', value: '+1', reshuffle: false, fromPerk: true },
-  poison1: { id: 'poison1', label: '+1 Poison', value: '+1', reshuffle: false, fromPerk: true },
-  curse1: { id: 'curse1', label: '+1 Curse', value: '+1', reshuffle: false, fromPerk: true },
-  frost1: { id: 'frost1', label: '+1 Frost', value: '+1', reshuffle: false, fromPerk: true },
-  dark1: { id: 'dark1', label: '+1 Dark', value: '+1', reshuffle: false, fromPerk: true },
+  'heal-target0': { id: 'heal-target0', label: '+0 Heal 1, Target 1 ally', value: '+0', reshuffle: false, fromPerk: true, icons: ['Heal', 'Target'] },
+  'heal-target1': { id: 'heal-target1', label: '+1 Heal 1, Target 1 ally', value: '+1', reshuffle: false, fromPerk: true, icons: ['Heal', 'Target'] },
+  poison1: { id: 'poison1', label: '+1 Poison', value: '+1', reshuffle: false, fromPerk: true, icons: ['Poison'] },
+  curse1: { id: 'curse1', label: '+1 Curse', value: '+1', reshuffle: false, fromPerk: true, icons: ['Curse'] },
+  frost1: { id: 'frost1', label: '+1 Frost', value: '+1', reshuffle: false, fromPerk: true, icons: ['Frost'] },
+  dark1: { id: 'dark1', label: '+1 Dark', value: '+1', reshuffle: false, fromPerk: true, icons: ['Dark'] },
   plus3: { id: 'plus3', label: 'Plus 3', value: '+3', reshuffle: false, fromPerk: true },
 }
 
