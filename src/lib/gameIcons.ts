@@ -40,6 +40,10 @@ const ICON_FILES: Record<string, string> = {
   Strengthen: 'strengthen',
   Ward: 'ward',
   Regenerate: 'regenerate',
+  Invisible: 'invisible',
+  Impair: 'impair',
+  Bane: 'bane',
+  Brittle: 'brittle',
   // Actions / attributes
   Attack: 'attack',
   Move: 'move',

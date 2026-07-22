@@ -1,6 +1,7 @@
 import { useState, type Dispatch, type SetStateAction } from 'react'
 import { VOIDWARDEN_HP_BY_LEVEL, VOIDWARDEN_KEYWORDS, VOIDWARDEN_XP_BY_LEVEL } from '../data/voidwarden'
 import type { CharacterState } from '../types'
+import { ConditionTracker } from './ConditionTracker'
 import { Counter } from './Counter'
 import { ResourceTracker } from './ResourceTracker'
 
@@ -88,6 +89,8 @@ export function CharacterSheet({ character, onChange, onLevelChange }: Character
         </div>
         <p className="field-hint">Max HP auto-fills from Level (per the Voidwarden mat) — adjust it directly if an item or effect changes it.</p>
       </div>
+
+      <ConditionTracker character={character} onChange={onChange} />
 
       <div className="stat-grid">
         <div>

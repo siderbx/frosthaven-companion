@@ -28,6 +28,8 @@ const defaultCharacter: CharacterState = {
   currentHp: VOIDWARDEN_HP_BY_LEVEL[1],
   battleGoalCheckmarks: 0,
   resources: emptyResources,
+  conditions: {},
+  inTurn: false,
 }
 
 const seededPerks: Perk[] = VOIDWARDEN_PERKS.map((p) => ({
@@ -60,6 +62,8 @@ const sanitizeCharacter = (v: unknown): CharacterState | null => {
     ...defaultCharacter,
     ...(v as Partial<CharacterState>),
     resources: { ...emptyResources, ...(storedResources as Partial<Record<ResourceType, number>>) },
+    conditions: isObj(v.conditions) ? (v.conditions as CharacterState['conditions']) : {},
+    inTurn: v.inTurn === true,
   }
 }
 

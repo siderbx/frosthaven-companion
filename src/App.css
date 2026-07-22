@@ -299,6 +299,124 @@
   gap: 12px;
 }
 
+/* Conditions */
+
+.condition-tracker {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.condition-header {
+  margin-bottom: 0;
+}
+
+.condition-title {
+  margin: 0;
+  font-size: 17px;
+}
+
+.condition-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.condition-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px 6px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0.65;
+}
+
+.condition-btn.active {
+  opacity: 1;
+  border-color: var(--accent);
+  color: var(--text-h);
+  background: var(--panel-bg);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.condition-icon {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.condition-timer {
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  background: var(--accent-strong);
+  color: #04141c;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+.turn-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.turn-btn.in-turn {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.amount-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.amount-value {
+  width: 40px;
+  padding: 4px;
+  font-size: 16px;
+}
+
+.amount-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.condition-log {
+  list-style: none;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1px dashed var(--border);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 .counter-row {
   display: flex;
   align-items: center;

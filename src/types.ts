@@ -13,6 +13,40 @@ export const RESOURCE_TYPES = [
 
 export type ResourceType = (typeof RESOURCE_TYPES)[number]
 
+/**
+ * Conditions that expire on their own: removed at the end of the affected figure's
+ * next turn (one gained during the figure's own turn survives that turn's end and
+ * expires at the end of the following turn).
+ */
+export const ROUND_CONDITIONS = [
+  'Stun',
+  'Immobilize',
+  'Disarm',
+  'Muddle',
+  'Impair',
+  'Strengthen',
+  'Invisible',
+] as const
+
+/**
+ * Conditions with no timed expiry — each persists until its specific removal
+ * trigger fires (a Heal, suffering damage, …; see CONDITION_RULES). Bane is the
+ * hybrid: it triggers 10 damage on the same end-of-next-turn clock the round
+ * conditions use, but a Heal also removes it early.
+ */
+export const TRIGGER_CONDITIONS = ['Wound', 'Poison', 'Bane', 'Brittle', 'Regenerate', 'Ward'] as const
+
+export const CONDITION_TYPES = [...ROUND_CONDITIONS, ...TRIGGER_CONDITIONS] as const
+
+export type ConditionType = (typeof CONDITION_TYPES)[number]
+
+/**
+ * Active conditions on the figure. Timed conditions (round conditions + Bane) map
+ * to the number of the figure's turn-ends remaining before expiry; pure trigger
+ * conditions map to null.
+ */
+export type ConditionMap = Partial<Record<ConditionType, number | null>>
+
 export interface CharacterState {
   name: string
   className: string
@@ -25,6 +59,9 @@ export interface CharacterState {
   battleGoalCheckmarks: number
   /** How many of each crafting resource the character has collected. */
   resources: Record<ResourceType, number>
+  conditions: ConditionMap
+  /** True between Start Turn and End Turn — decides the expiry timer a newly gained timed condition gets. */
+  inTurn: boolean
 }
 
 export type PerkPickSource = 'level' | 'points'
