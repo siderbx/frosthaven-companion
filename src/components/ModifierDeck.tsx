@@ -22,11 +22,13 @@ export function ModifierDeck({ deck, onChange }: ModifierDeckProps) {
   const draw = () => onChange((prev) => drawCard(prev))
   const shuffle = () => onChange((prev) => shuffleAll(prev))
 
+  // Rendered inside the Action Cards tab's right column (above Reserve), so the
+  // root is a plain section — the surrounding panel and column supply the chrome.
   return (
-    <div className="panel">
+    <div className="deck-embedded">
       <div className="panel-header">
-        <h2>Attack Modifier Deck</h2>
-        <button type="button" className="link-btn" onClick={() => setShowComposition((v) => !v)}>
+        <h3>Modifier Deck</h3>
+        <button type="button" className="link-btn small" onClick={() => setShowComposition((v) => !v)}>
           {showComposition ? 'Hide composition' : 'Show composition'}
         </button>
       </div>

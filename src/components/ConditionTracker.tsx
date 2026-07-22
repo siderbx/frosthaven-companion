@@ -81,7 +81,9 @@ export function ConditionTracker({ character, onChange }: ConditionTrackerProps)
         )}
       </div>
 
+      <span className="condition-group-label negative">Negative</span>
       <div className="condition-grid">{NEGATIVE.map(conditionButton)}</div>
+      <span className="condition-group-label positive">Positive</span>
       <div className="condition-grid">{POSITIVE.map(conditionButton)}</div>
 
       <div className="turn-controls">

@@ -1,17 +1,20 @@
 import { useMemo, useState, type Dispatch, type SetStateAction } from 'react'
-import type { ActionCard } from '../types'
+import type { ActionCard, ModifierDeckState } from '../types'
 import { persistentEffectFor, VOIDWARDEN_CARD_DETAILS, voidwardenActionCardFrom } from '../data/voidwarden'
 import { CardText } from './CardText'
 import { LOSS_ICON } from '../lib/gameIcons'
+import { ModifierDeck } from './ModifierDeck'
 
 interface ActionCardsProps {
   cards: ActionCard[]
   onChange: Dispatch<SetStateAction<ActionCard[]>>
   /** Character's current level — drives the level-up card pick (one add per level 2–9). */
   characterLevel: number
+  deck: ModifierDeckState
+  onDeckChange: Dispatch<SetStateAction<ModifierDeckState>>
 }
 
-export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProps) {
+export function ActionCards({ cards, onChange, characterLevel, deck, onDeckChange }: ActionCardsProps) {
   const [topCardId, setTopCardId] = useState<string | null>(null)
   const [bottomCardId, setBottomCardId] = useState<string | null>(null)
   /** Selected card ids in the order they were picked — the first is the leading card. */
@@ -440,23 +443,6 @@ export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProp
         </div>
 
         <div className="card-column">
-          {reserve.length > 0 && (
-            <>
-              <h3>Reserve ({reserve.length})</h3>
-              <p className="field-hint">Cards not currently in your hand of 11 — your 3 starting "X" cards plus any level-up cards you've added.</p>
-              {reserve.map((card) => (
-                <div key={card.id} className="action-card compact reserve-row">
-                  <span>
-                    {card.name} <span className="muted">({card.initiative})</span>
-                  </span>
-                  <button type="button" className="link-btn small" onClick={() => moveToHand(card.id)}>
-                    To Hand
-                  </button>
-                </div>
-              ))}
-            </>
-          )}
-
           <h3>Used ({used.length})</h3>
           {used.map((card) => (
             <div key={card.id} className="action-card compact">
@@ -514,6 +500,25 @@ export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProp
                 ))}
               </div>
             </div>
+          )}
+
+          <ModifierDeck deck={deck} onChange={onDeckChange} />
+
+          {reserve.length > 0 && (
+            <>
+              <h3>Reserve ({reserve.length})</h3>
+              <p className="field-hint">Cards not currently in your hand of 11 — your 3 starting "X" cards plus any level-up cards you've added.</p>
+              {reserve.map((card) => (
+                <div key={card.id} className="action-card compact reserve-row">
+                  <span>
+                    {card.name} <span className="muted">({card.initiative})</span>
+                  </span>
+                  <button type="button" className="link-btn small" onClick={() => moveToHand(card.id)}>
+                    To Hand
+                  </button>
+                </div>
+              ))}
+            </>
           )}
         </div>
       </div>

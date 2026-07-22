@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction } from 'react'
+import { useState, type Dispatch, type SetStateAction } from 'react'
 import type { Mastery } from '../types'
 import { CardText } from './CardText'
 
@@ -8,6 +8,10 @@ interface MasteryListProps {
 }
 
 export function MasteryList({ masteries, onChange }: MasteryListProps) {
+  // Masteries render as read-only decorated text (inline game icons); editing is
+  // rare (house rules / errata), so the input only appears for the row being edited.
+  const [editingId, setEditingId] = useState<string | null>(null)
+
   const updateText = (id: string, text: string) =>
     onChange((prev) => prev.map((m) => (m.id === id ? { ...m, text } : m)))
 
@@ -33,25 +37,52 @@ export function MasteryList({ masteries, onChange }: MasteryListProps) {
       <ul className="perk-list">
         {masteries.map((mastery) => (
           <li key={mastery.id} className={`perk-row ${mastery.achieved ? 'checked' : ''}`}>
-            <div className="perk-main">
-              <input
-                className="text-input"
-                type="text"
-                placeholder="Mastery condition…"
-                value={mastery.text}
-                onChange={(e) => updateText(mastery.id, e.target.value)}
-              />
-              <button
-                type="button"
-                className={`perk-box ${mastery.achieved ? 'filled level' : ''}`}
-                aria-label={mastery.achieved ? 'Achieved — tap to undo' : 'Mark achieved'}
-                onClick={() => toggleAchieved(mastery.id)}
-              />
-            </div>
-            {mastery.text.trim() && (
-              <p className="mastery-preview">
-                <CardText text={mastery.text} />
-              </p>
+            {editingId === mastery.id ? (
+              <div className="mastery-edit">
+                <input
+                  className="text-input"
+                  type="text"
+                  placeholder="Mastery condition…"
+                  value={mastery.text}
+                  autoFocus
+                  onChange={(e) => updateText(mastery.id, e.target.value)}
+                  onBlur={() => setEditingId(null)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === 'Escape') setEditingId(null)
+                  }}
+                />
+                <button type="button" className="secondary-btn small" onClick={() => setEditingId(null)}>
+                  Done
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="perk-main">
+                  <span className="perk-label">
+                    {mastery.text.trim() ? (
+                      <CardText text={mastery.text} />
+                    ) : (
+                      <span className="muted">Mastery condition…</span>
+                    )}
+                  </span>
+                </div>
+                <div className="head-right">
+                  <button
+                    type="button"
+                    className="link-btn small"
+                    aria-label="Edit mastery text"
+                    onClick={() => setEditingId(mastery.id)}
+                  >
+                    ✎ Edit
+                  </button>
+                  <button
+                    type="button"
+                    className={`perk-box ${mastery.achieved ? 'filled level' : ''}`}
+                    aria-label={mastery.achieved ? 'Achieved — tap to undo' : 'Mark achieved'}
+                    onClick={() => toggleAchieved(mastery.id)}
+                  />
+                </div>
+              </>
             )}
           </li>
         ))}

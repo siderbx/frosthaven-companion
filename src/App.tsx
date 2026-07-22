@@ -3,7 +3,6 @@ import './App.css'
 import { CharacterSheet } from './components/CharacterSheet'
 import { PerkList } from './components/PerkList'
 import { MasteryList } from './components/MasteryList'
-import { ModifierDeck } from './components/ModifierDeck'
 import { ActionCards } from './components/ActionCards'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { freshDeck, defaultComposition, deriveDeckComposition, sameComposition } from './lib/modifierDeck'
@@ -13,7 +12,9 @@ import { VOIDWARDEN_MASTERIES, withVoidwardenMasteryFixes } from './data/voidwar
 import { RESOURCE_TYPES } from './types'
 import type { ActionCard, CharacterState, Mastery, ModifierDeckState, Perk, ResourceType } from './types'
 
-const TABS = ['Character', 'Perks', 'Modifier Deck', 'Action Cards'] as const
+// The modifier deck lives on the Action Cards tab (drawn during attacks), so it
+// has no tab of its own.
+const TABS = ['Character', 'Perks', 'Action Cards'] as const
 type Tab = (typeof TABS)[number]
 
 const emptyResources = Object.fromEntries(RESOURCE_TYPES.map((r) => [r, 0])) as Record<ResourceType, number>
@@ -147,9 +148,14 @@ function App() {
             <MasteryList masteries={masteries} onChange={setMasteries} />
           </div>
         )}
-        {tab === 'Modifier Deck' && <ModifierDeck deck={deck} onChange={setDeck} />}
         {tab === 'Action Cards' && (
-          <ActionCards cards={cards} onChange={setCards} characterLevel={character.level} />
+          <ActionCards
+            cards={cards}
+            onChange={setCards}
+            characterLevel={character.level}
+            deck={deck}
+            onDeckChange={setDeck}
+          />
         )}
       </main>
     </div>

@@ -62,22 +62,22 @@ export function PerkList({ perks, onChange, character, onCharacterChange }: Perk
               <span className="perk-label">
                 <CardText text={perk.label} />
               </span>
-              <div className="perk-boxes">
-                {Array.from({ length: perk.timesAvailable }).map((_, i) => {
-                  const source = perk.picks[i]
-                  const isNext = i === perk.picks.length
-                  return (
-                    <button
-                      key={i}
-                      type="button"
-                      className={`perk-box ${source ? `filled ${source}` : ''}`}
-                      disabled={!source && !isNext}
-                      aria-label={source ? `Pick ${i + 1}, from ${source} — tap to undo` : `Pick ${i + 1} of ${perk.timesAvailable}`}
-                      onClick={() => (source ? undoPick(perk.id, i) : setPendingPerkId(perk.id))}
-                    />
-                  )
-                })}
-              </div>
+            </div>
+            <div className="perk-boxes">
+              {Array.from({ length: perk.timesAvailable }).map((_, i) => {
+                const source = perk.picks[i]
+                const isNext = i === perk.picks.length
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    className={`perk-box ${source ? `filled ${source}` : ''}`}
+                    disabled={!source && !isNext}
+                    aria-label={source ? `Pick ${i + 1}, from ${source} — tap to undo` : `Pick ${i + 1} of ${perk.timesAvailable}`}
+                    onClick={() => (source ? undoPick(perk.id, i) : setPendingPerkId(perk.id))}
+                  />
+                )
+              })}
             </div>
             {pendingPerkId === perk.id && (
               <div className="pick-source-picker">
