@@ -313,29 +313,35 @@ export function ActionCards({ cards, onChange, characterLevel, deck, onDeckChang
             </div>
           </div>
           <div className="round-actions">
-            {topCard && bottomCard && (
-              <button type="button" className="link-btn" onClick={swapLead}>
-                Swap lead
-              </button>
+            {suggestions.length > 0 && (
+              <div className="suggestions">
+                <span className="muted">Suggested:</span>
+                {suggestions.map(({ card }) => (
+                  <button
+                    type="button"
+                    key={card.id}
+                    className="suggestion-chip"
+                    onClick={() => pickSlot('bottom', card.id)}
+                  >
+                    {card.name} ({card.initiative})
+                  </button>
+                ))}
+              </div>
             )}
-            <button type="button" className="link-btn" onClick={clearRound}>
-              Clear
-            </button>
-            <button type="button" className="primary-btn" disabled={!topCard || !bottomCard} onClick={confirmRound}>
-              Confirm round
-            </button>
+            <div className="round-buttons">
+              {topCard && bottomCard && (
+                <button type="button" className="link-btn" onClick={swapLead}>
+                  Swap lead
+                </button>
+              )}
+              <button type="button" className="link-btn" onClick={clearRound}>
+                Clear
+              </button>
+              <button type="button" className="primary-btn" disabled={!topCard || !bottomCard} onClick={confirmRound}>
+                Confirm round
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-
-      {suggestions.length > 0 && (
-        <div className="suggestions">
-          <span className="muted">Suggested pairing:</span>
-          {suggestions.map(({ card }) => (
-            <button type="button" key={card.id} className="suggestion-chip" onClick={() => pickSlot('bottom', card.id)}>
-              {card.name} ({card.initiative})
-            </button>
-          ))}
         </div>
       )}
 

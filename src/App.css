@@ -951,10 +951,19 @@
   font-size: 12px;
 }
 
+/* Pins to the viewport top while scrolling the hand list, so the current
+   picks (and which card leads) stay visible. Only rendered while a pick is
+   active. Bleeds over the panel's side padding so cards don't peek out
+   along the edges as they scroll beneath it. */
 .round-picker {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--panel-bg);
   border-top: 1px solid var(--border);
-  padding: 16px 0;
-  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  padding: 16px 20px;
+  margin: 0 -20px 16px;
 }
 
 .round-slots {
@@ -976,16 +985,28 @@
 
 .round-actions {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
+/* Swap/Clear/Confirm wrap as one unit so Confirm never strands alone. */
+.round-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* Lives inside the sticky round bar's action row, pushed to the left of
+   Clear / Confirm round. Only shown while the bottom slot is still open. */
 .suggestions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  padding-bottom: 16px;
+  margin-right: auto;
 }
 
 .suggestion-chip {
