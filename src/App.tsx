@@ -6,7 +6,7 @@ import { MasteryList } from './components/MasteryList'
 import { ActionCards } from './components/ActionCards'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { freshDeck, defaultComposition, deriveDeckComposition, sameComposition } from './lib/modifierDeck'
-import { VOIDWARDEN_HP_BY_LEVEL, buildVoidwardenActionCards, withVoidwardenCardText } from './data/voidwarden'
+import { VOIDWARDEN_HP_BY_LEVEL, buildVoidwardenActionCards, levelForXp, withVoidwardenCardText } from './data/voidwarden'
 import { VOIDWARDEN_PERKS, deckEffectsFromPerks, withVoidwardenPerkFixes } from './data/voidwardenPerks'
 import { VOIDWARDEN_MASTERIES, withVoidwardenMasteryFixes } from './data/voidwardenMasteries'
 import { RESOURCE_TYPES } from './types'
@@ -59,13 +59,15 @@ const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object
 const sanitizeCharacter = (v: unknown): CharacterState | null => {
   if (!isObj(v)) return null
   const storedResources = isObj(v.resources) ? v.resources : {}
-  return {
+  const merged = {
     ...defaultCharacter,
     ...(v as Partial<CharacterState>),
     resources: { ...emptyResources, ...(storedResources as Partial<Record<ResourceType, number>>) },
     conditions: isObj(v.conditions) ? (v.conditions as CharacterState['conditions']) : {},
     inTurn: v.inTurn === true,
   }
+  // Level is derived from XP now — reconcile saves from when it was set by hand.
+  return { ...merged, level: levelForXp(merged.xp) }
 }
 
 const sanitizePerks = (v: unknown): Perk[] | null =>
@@ -95,6 +97,28 @@ function App() {
   const [masteries, setMasteries] = useLocalStorage<Mastery[]>('fh-masteries', seededMasteries, sanitizeMasteries)
   const [deck, setDeck] = useLocalStorage<ModifierDeckState>('fh-deck', freshDeck(defaultComposition()), sanitizeDeck)
   const [cards, setCards] = useLocalStorage<ActionCard[]>('fh-cards', seededCards, sanitizeCards)
+  // Two-step confirm for the scenario reset, and a remount key so per-tab local
+  // state (round picks, rest pickers, the condition log) resets along with it.
+  const [confirmReset, setConfirmReset] = useState(false)
+  const [scenarioEpoch, setScenarioEpoch] = useState(0)
+
+  // Fresh slate for the next scenario: refill HP, clear conditions, return every
+  // played/lost/active card to hand (the Reserve split is kept), and reshuffle
+  // the full modifier deck. Progression — XP, gold, level, perks, checkmarks,
+  // resources, masteries — is exactly what survives between scenarios, so it stays.
+  const resetScenario = () => {
+    setCharacter((prev) => ({ ...prev, currentHp: prev.maxHp, conditions: {}, inTurn: false }))
+    setCards((prev) =>
+      prev.map((c) =>
+        c.status === 'used' || c.status === 'lost' || c.status === 'active'
+          ? { ...c, status: 'hand', activeCharges: undefined, activeHalf: undefined }
+          : c,
+      ),
+    )
+    setDeck((prev) => freshDeck(prev.composition))
+    setScenarioEpoch((e) => e + 1)
+    setConfirmReset(false)
+  }
 
   // One-time data fix-ups for content stored before a correction landed. Each is
   // idempotent (no-op once applied): card text fills only blank fields; the perk
@@ -124,6 +148,23 @@ function App() {
       <header className="app-header">
         <h1>{character.name || 'Frosthaven Companion'}</h1>
         <span className="header-sub">{character.className}</span>
+        <div className="header-actions">
+          {confirmReset ? (
+            <>
+              <span className="muted">Refill HP, clear conditions, return all cards, reshuffle deck?</span>
+              <button type="button" className="secondary-btn small" onClick={resetScenario}>
+                Reset
+              </button>
+              <button type="button" className="link-btn small" onClick={() => setConfirmReset(false)}>
+                Cancel
+              </button>
+            </>
+          ) : (
+            <button type="button" className="secondary-btn small" onClick={() => setConfirmReset(true)}>
+              New Scenario
+            </button>
+          )}
+        </div>
       </header>
 
       <nav className="tab-bar">
@@ -136,11 +177,7 @@ function App() {
 
       <main className="app-main">
         {tab === 'Character' && (
-          <CharacterSheet
-            character={character}
-            onChange={setCharacter}
-            onLevelChange={() => setTab('Action Cards')}
-          />
+          <CharacterSheet key={scenarioEpoch} character={character} onChange={setCharacter} />
         )}
         {tab === 'Perks' && (
           <div className="panel-stack">
@@ -150,6 +187,7 @@ function App() {
         )}
         {tab === 'Action Cards' && (
           <ActionCards
+            key={scenarioEpoch}
             cards={cards}
             onChange={setCards}
             characterLevel={character.level}

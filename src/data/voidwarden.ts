@@ -29,6 +29,15 @@ export const VOIDWARDEN_XP_BY_LEVEL: Record<number, number> = {
   9: 500,
 }
 
+/** The level this much XP puts the character at (highest threshold reached). */
+export const levelForXp = (xp: number): number => {
+  let level = 1
+  for (const [lvl, threshold] of Object.entries(VOIDWARDEN_XP_BY_LEVEL)) {
+    if (xp >= threshold) level = Math.max(level, Number(lvl))
+  }
+  return level
+}
+
 export interface VoidwardenCardDetail {
   name: string
   /** Printed unlock level: 1 covers both the level-1 and level-X starting cards; 2–9 are the cards gained via the level-up choice. */

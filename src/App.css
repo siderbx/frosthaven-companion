@@ -24,6 +24,15 @@
   font-weight: 500;
 }
 
+/* New Scenario reset (and its inline confirm) — pushed to the header's right edge. */
+.header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .tab-bar {
   display: flex;
   gap: 4px;
