@@ -21,6 +21,9 @@ dist-ssr
 # Claude Code local state
 .claude/
 
+# Local-only rulebook reference (copyrighted scans — keep out of the public repo)
+docs/reference/gloomhaven-rules-master/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
