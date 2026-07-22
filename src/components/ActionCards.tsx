@@ -12,7 +12,6 @@ interface ActionCardsProps {
 }
 
 export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProps) {
-  const [showAdd, setShowAdd] = useState(false)
   const [topCardId, setTopCardId] = useState<string | null>(null)
   const [bottomCardId, setBottomCardId] = useState<string | null>(null)
   /** Selected card ids in the order they were picked — the first is the leading card. */
@@ -38,19 +37,6 @@ export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProp
     () =>
       VOIDWARDEN_CARD_DETAILS.filter(
         (d) => d.level >= 2 && d.level <= characterLevel && !ownedNames.has(d.name.toLowerCase()),
-      ).sort((a, b) => a.level - b.level || a.initiative - b.initiative),
-    [ownedNames, characterLevel],
-  )
-
-  // Every real card you could add right now via "+ Add card": any Voidwarden card
-  // unlocked at your level (1..current) that you don't already own. This is a
-  // superset of the level-up chooser's list — it also lets you re-add a level-1
-  // card you removed by mistake. Adds are constrained to the real card pool, so
-  // no arbitrary typed-in cards.
-  const addableCards = useMemo(
-    () =>
-      VOIDWARDEN_CARD_DETAILS.filter(
-        (d) => d.level <= characterLevel && !ownedNames.has(d.name.toLowerCase()),
       ).sort((a, b) => a.level - b.level || a.initiative - b.initiative),
     [ownedNames, characterLevel],
   )
@@ -95,8 +81,6 @@ export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProp
     setBottomCardId(null)
     setPickOrder([])
   }
-
-  const removeCard = (id: string) => onChange((prev) => prev.filter((c) => c.id !== id))
 
   const moveToHand = (id: string) =>
     onChange((prev) => prev.map((c) => (c.id === id ? { ...c, status: 'hand' } : c)))
@@ -209,9 +193,6 @@ export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProp
     <div className="panel">
       <div className="panel-header">
         <h2>Action Cards</h2>
-        <button type="button" className="link-btn" onClick={() => setShowAdd((v) => !v)}>
-          {showAdd ? 'Cancel' : '+ Add card'}
-        </button>
       </div>
 
       {owedPicks > 0 && (
@@ -306,53 +287,8 @@ export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProp
         </div>
       )}
 
-      {cards.length === 0 && !showAdd && (
-        <p className="empty-hint">
-          Your 14 starting Human Voidwarden cards seed automatically. Use <strong>+ Add card</strong> to
-          pull any real card from the class pool if you're missing one.
-        </p>
-      )}
-
-      {showAdd && (
-        <div className="add-card-picker">
-          <p className="field-hint">
-            Add a card from the Human Voidwarden pool — only cards unlocked at your level (
-            {characterLevel}) that you don't already own are shown. Added cards go to Reserve; swap them
-            into your hand of 11 as you like.
-          </p>
-          {addableCards.length === 0 ? (
-            <p className="field-hint">You already own every card available at level {characterLevel}.</p>
-          ) : (
-            <div className="level-pick-list">
-              {addableCards.map((d) => (
-                <div key={d.name} className="action-card level-pick-card">
-                  <div className="action-card-head">
-                    <strong>{d.name}</strong>
-                    <span className="head-right">
-                      <span className="lvl-badge">L{d.level}</span>
-                      <span className="init-badge">{d.initiative}</span>
-                      <button
-                        type="button"
-                        className="secondary-btn small"
-                        onClick={() => addFromCatalog(d.name)}
-                      >
-                        Add
-                      </button>
-                    </span>
-                  </div>
-                  <div className="action-card-body">
-                    <span className="side-static">
-                      Top{d.topLoss ? ` ${LOSS_ICON}` : ''}: <CardText text={d.topText} />
-                    </span>
-                    <span className="side-static">
-                      Bottom{d.bottomLoss ? ` ${LOSS_ICON}` : ''}: <CardText text={d.bottomText} />
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+      {cards.length === 0 && (
+        <p className="empty-hint">Your 14 starting Human Voidwarden cards seed automatically.</p>
       )}
 
       {(topCard || bottomCard) && (
@@ -467,9 +403,6 @@ export function ActionCards({ cards, onChange, characterLevel }: ActionCardsProp
                     <span className="init-badge">{card.initiative}</span>
                     <button type="button" className="link-btn small" onClick={() => moveToReserve(card.id)}>
                       To Reserve
-                    </button>
-                    <button type="button" className="remove-btn" onClick={() => removeCard(card.id)} aria-label="Remove card">
-                      ×
                     </button>
                   </span>
                 </div>

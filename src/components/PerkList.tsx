@@ -12,19 +12,7 @@ interface PerkListProps {
 }
 
 export function PerkList({ perks, onChange, character, onCharacterChange }: PerkListProps) {
-  const [draftLabel, setDraftLabel] = useState('')
-  const [draftTimes, setDraftTimes] = useState(1)
   const [pendingPerkId, setPendingPerkId] = useState<string | null>(null)
-
-  const addPerk = () => {
-    const label = draftLabel.trim()
-    if (!label) return
-    onChange((prev) => [...prev, { id: crypto.randomUUID(), label, timesAvailable: draftTimes, picks: [] }])
-    setDraftLabel('')
-    setDraftTimes(1)
-  }
-
-  const remove = (id: string) => onChange((prev) => prev.filter((p) => p.id !== id))
 
   const confirmPick = (perkId: string, source: PerkPickSource) => {
     onChange((prev) => prev.map((p) => (p.id === perkId ? { ...p, picks: [...p.picks, source] } : p)))
@@ -110,40 +98,9 @@ export function PerkList({ perks, onChange, character, onCharacterChange }: Perk
                 </button>
               </div>
             )}
-            <button type="button" className="remove-btn" onClick={() => remove(perk.id)} aria-label="Remove perk">
-              ×
-            </button>
           </li>
         ))}
       </ul>
-
-      <form
-        className="add-row perk-add-row"
-        onSubmit={(e) => {
-          e.preventDefault()
-          addPerk()
-        }}
-      >
-        <input
-          className="text-input"
-          type="text"
-          placeholder="Add a perk…"
-          value={draftLabel}
-          onChange={(e) => setDraftLabel(e.target.value)}
-        />
-        <input
-          className="text-input tiny"
-          type="number"
-          min={1}
-          max={3}
-          value={draftTimes}
-          onChange={(e) => setDraftTimes(Number(e.target.value))}
-          aria-label="Times this perk can be picked"
-        />
-        <button type="submit" className="primary-btn">
-          Add
-        </button>
-      </form>
     </div>
   )
 }

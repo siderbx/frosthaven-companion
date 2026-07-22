@@ -14,10 +14,6 @@ export function MasteryList({ masteries, onChange }: MasteryListProps) {
   const toggleAchieved = (id: string) =>
     onChange((prev) => prev.map((m) => (m.id === id ? { ...m, achieved: !m.achieved } : m)))
 
-  const addMastery = () => onChange((prev) => [...prev, { id: crypto.randomUUID(), text: '', achieved: false }])
-
-  const remove = (id: string) => onChange((prev) => prev.filter((m) => m.id !== id))
-
   const achievedCount = masteries.filter((m) => m.achieved).length
 
   return (
@@ -58,18 +54,9 @@ export function MasteryList({ masteries, onChange }: MasteryListProps) {
                 <CardText text={mastery.text} />
               </p>
             )}
-            <button type="button" className="remove-btn" onClick={() => remove(mastery.id)} aria-label="Remove mastery">
-              ×
-            </button>
           </li>
         ))}
       </ul>
-
-      <div className="add-row">
-        <button type="button" className="secondary-btn" onClick={addMastery}>
-          + Add mastery
-        </button>
-      </div>
     </div>
   )
 }
