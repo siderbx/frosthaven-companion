@@ -27,8 +27,7 @@ export function MasteryList({ masteries, onChange }: MasteryListProps) {
 
       <p className="empty-hint">
         Each mastery must be completed entirely within a single scenario your party wins (Scenario 0 doesn't
-        count). Exact wording isn't verified against the physical mat yet — type it in below and check it off
-        once earned.
+        count). Wording matches the physical mat — check one off once earned.
       </p>
 
       <ul className="perk-list">
