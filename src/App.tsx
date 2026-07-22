@@ -6,7 +6,7 @@ import { MasteryList } from './components/MasteryList'
 import { ActionCards } from './components/ActionCards'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { freshDeck, defaultComposition, deriveDeckComposition, sameComposition } from './lib/modifierDeck'
-import { VOIDWARDEN_HP_BY_LEVEL, buildVoidwardenActionCards, levelForXp, withVoidwardenCardText } from './data/voidwarden'
+import { VOIDWARDEN_HP_BY_LEVEL, buildVoidwardenActionCards, withVoidwardenCardText } from './data/voidwarden'
 import { VOIDWARDEN_PERKS, deckEffectsFromPerks, withVoidwardenPerkFixes } from './data/voidwardenPerks'
 import { VOIDWARDEN_MASTERIES, withVoidwardenMasteryFixes } from './data/voidwardenMasteries'
 import { RESOURCE_TYPES } from './types'
@@ -66,8 +66,10 @@ const sanitizeCharacter = (v: unknown): CharacterState | null => {
     conditions: isObj(v.conditions) ? (v.conditions as CharacterState['conditions']) : {},
     inTurn: v.inTurn === true,
   }
-  // Level is derived from XP now — reconcile saves from when it was set by hand.
-  return { ...merged, level: levelForXp(merged.xp) }
+  // Max HP is not editable — it always follows Level per the mat's table, so
+  // reconcile saves from when it could be adjusted by hand.
+  const maxHp = VOIDWARDEN_HP_BY_LEVEL[merged.level] ?? merged.maxHp
+  return { ...merged, maxHp, currentHp: Math.min(merged.currentHp, maxHp) }
 }
 
 const sanitizePerks = (v: unknown): Perk[] | null =>
@@ -177,7 +179,12 @@ function App() {
 
       <main className="app-main">
         {tab === 'Character' && (
-          <CharacterSheet key={scenarioEpoch} character={character} onChange={setCharacter} />
+          <CharacterSheet
+            key={scenarioEpoch}
+            character={character}
+            onChange={setCharacter}
+            onLevelChange={() => setTab('Action Cards')}
+          />
         )}
         {tab === 'Perks' && (
           <div className="panel-stack">
