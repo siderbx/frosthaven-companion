@@ -147,7 +147,8 @@
 }
 
 .primary-btn:disabled,
-.secondary-btn:disabled {
+.secondary-btn:disabled,
+.link-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
@@ -484,6 +485,48 @@
   border: 1px dashed var(--border);
   font-size: 14px;
   line-height: 1.5;
+}
+
+/* Turn & conditions strip on the Action Cards tab */
+.turn-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel-bg);
+}
+
+.turn-strip-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.turn-conditions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.condition-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: var(--bg);
+  color: var(--text-h);
+  font-size: 14px;
+}
+
+.over-cap-hint {
+  color: var(--accent);
 }
 
 .counter-row {

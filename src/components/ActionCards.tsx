@@ -1,20 +1,46 @@
 import { useMemo, useState, type Dispatch, type SetStateAction } from 'react'
-import type { ActionCard, ModifierDeckState } from '../types'
-import { persistentEffectFor, VOIDWARDEN_CARD_DETAILS, voidwardenActionCardFrom } from '../data/voidwarden'
+import type { ActionCard, CharacterState, ConditionType, ModifierDeckState } from '../types'
+import {
+  persistentEffectFor,
+  VOIDWARDEN_CARD_DETAILS,
+  VOIDWARDEN_HAND_SIZE,
+  voidwardenActionCardFrom,
+} from '../data/voidwarden'
+import { CONDITION_RULES, endTurn, startTurn, type ConditionOutcome } from '../lib/conditions'
 import { CardText } from './CardText'
-import { LOSS_ICON } from '../lib/gameIcons'
+import { GAME_ICONS, LOSS_ICON } from '../lib/gameIcons'
 import { ModifierDeck } from './ModifierDeck'
 
 interface ActionCardsProps {
   cards: ActionCard[]
   onChange: Dispatch<SetStateAction<ActionCard[]>>
-  /** Character's current level — drives the level-up card pick (one add per level 2–9). */
-  characterLevel: number
+  /** Character state — Confirm round / End Turn here drive the condition-expiry clock. */
+  character: CharacterState
+  onCharacterChange: Dispatch<SetStateAction<CharacterState>>
   deck: ModifierDeckState
   onDeckChange: Dispatch<SetStateAction<ModifierDeckState>>
 }
 
-export function ActionCards({ cards, onChange, characterLevel, deck, onDeckChange }: ActionCardsProps) {
+/**
+ * Confirm round doubles as the character's turn start: start-of-turn effects
+ * (Regenerate, Wound) fire here. If the previous turn was never explicitly
+ * ended, end it first so timed conditions still tick down every round.
+ */
+function beginTurn(char: CharacterState): ConditionOutcome {
+  const events: string[] = []
+  let state = char
+  if (state.inTurn) {
+    const ended = endTurn(state)
+    state = ended.character
+    for (const e of ended.events) events.push(`Last turn: ${e}`)
+  }
+  const started = startTurn(state)
+  for (const e of started.events) events.push(e)
+  return { character: started.character, events }
+}
+
+export function ActionCards({ cards, onChange, character, onCharacterChange, deck, onDeckChange }: ActionCardsProps) {
+  const characterLevel = character.level
   const [topCardId, setTopCardId] = useState<string | null>(null)
   const [bottomCardId, setBottomCardId] = useState<string | null>(null)
   /** Selected card ids in the order they were picked — the first is the leading card. */
@@ -23,12 +49,19 @@ export function ActionCards({ cards, onChange, characterLevel, deck, onDeckChang
   const [shortRestLoss, setShortRestLoss] = useState<{ id: string; rerolled: boolean } | null>(null)
   const [chooserCollapsed, setChooserCollapsed] = useState(false)
   const [pendingRemoveId, setPendingRemoveId] = useState<string | null>(null)
+  const [turnLog, setTurnLog] = useState<string[]>([])
 
   const reserve = cards.filter((c) => c.status === 'reserve')
   const hand = cards.filter((c) => c.status === 'hand')
   const used = cards.filter((c) => c.status === 'used')
   const lost = cards.filter((c) => c.status === 'lost')
   const active = cards.filter((c) => c.status === 'active')
+
+  // Hand-size cap: at most 11 cards outside Reserve. Counting played piles too
+  // means a card lost mid-scenario can't be replaced from Reserve — unchosen
+  // cards sit out the whole scenario per the rulebook.
+  const inPlay = cards.length - reserve.length
+  const handFull = inPlay >= VOIDWARDEN_HAND_SIZE
 
   // Level-up card picks. Each level from 2 to current grants one card add, so the
   // number owed is (levels gained) minus (leveled cards already owned). Derived,
@@ -86,7 +119,13 @@ export function ActionCards({ cards, onChange, characterLevel, deck, onDeckChang
   }
 
   const moveToHand = (id: string) =>
-    onChange((prev) => prev.map((c) => (c.id === id ? { ...c, status: 'hand' } : c)))
+    onChange((prev) => {
+      // Re-check against prev, not the render's snapshot, so rapid taps can't
+      // slip past the cap.
+      const outOfReserve = prev.filter((c) => c.status !== 'reserve').length
+      if (outOfReserve >= VOIDWARDEN_HAND_SIZE) return prev
+      return prev.map((c) => (c.id === id ? { ...c, status: 'hand' } : c))
+    })
 
   const moveToReserve = (id: string) =>
     onChange((prev) => prev.map((c) => (c.id === id ? { ...c, status: 'reserve' } : c)))
@@ -111,8 +150,22 @@ export function ActionCards({ cards, onChange, characterLevel, deck, onDeckChang
         return c
       }),
     )
+    // Confirming the round starts the character's turn (see beginTurn). Same
+    // functional-update pattern as ConditionTracker: the log is recomputed from
+    // the prop snapshot, the state update itself never drops an action.
+    setTurnLog(beginTurn(character).events)
+    onCharacterChange((prev) => beginTurn(prev).character)
     clearRound()
   }
+
+  // End the turn taken at Confirm round: timed conditions tick down and expire,
+  // Bane triggers. Mirrors the Character tab's End Turn button.
+  const finishTurn = () => {
+    setTurnLog(endTurn(character).events)
+    onCharacterChange((prev) => endTurn(prev).character)
+  }
+
+  const activeConditions = Object.entries(character.conditions) as [ConditionType, number | null][]
 
   // Move an active card to the pile its track says it ends in.
   const finishActive = (c: ActionCard): ActionCard => {
@@ -292,6 +345,51 @@ export function ActionCards({ cards, onChange, characterLevel, deck, onDeckChang
 
       {cards.length === 0 && (
         <p className="empty-hint">Your 14 starting Human Voidwarden cards seed automatically.</p>
+      )}
+
+      {(character.inTurn || activeConditions.length > 0 || turnLog.length > 0) && (
+        <div className="turn-strip">
+          <div className="turn-strip-row">
+            {activeConditions.length > 0 ? (
+              <span className="turn-conditions">
+                {activeConditions.map(([type, left]) => (
+                  <span key={type} className="condition-chip" title={CONDITION_RULES[type]}>
+                    <img className="condition-icon" src={GAME_ICONS[type]} alt="" aria-hidden="true" />
+                    {type}
+                    {typeof left === 'number' && (
+                      <span
+                        className="condition-timer"
+                        title={`Expires after ${left} more of your turn end${left === 1 ? '' : 's'}`}
+                      >
+                        {left}
+                      </span>
+                    )}
+                  </span>
+                ))}
+              </span>
+            ) : (
+              <span className="muted">No active conditions</span>
+            )}
+            {character.inTurn && (
+              <button type="button" className="secondary-btn small turn-btn in-turn" onClick={finishTurn}>
+                End Turn
+              </button>
+            )}
+          </div>
+          {turnLog.length > 0 && (
+            <ul className="condition-log">
+              {turnLog.map((line, i) => (
+                <li key={i}>{line}</li>
+              ))}
+            </ul>
+          )}
+          {character.inTurn && (
+            <p className="field-hint">
+              Confirm round started your turn (Wound / Regenerate applied). End Turn when you finish acting —
+              that's when timed conditions tick down. Toggle conditions on the Character tab as you gain them.
+            </p>
+          )}
+        </div>
       )}
 
       {(topCard || bottomCard) && (
@@ -513,13 +611,25 @@ export function ActionCards({ cards, onChange, characterLevel, deck, onDeckChang
           {reserve.length > 0 && (
             <>
               <h3>Reserve ({reserve.length})</h3>
-              <p className="field-hint">Cards not currently in your hand of 11 — your 3 starting "X" cards plus any level-up cards you've added.</p>
+              <p className="field-hint">Cards not currently in your hand of {VOIDWARDEN_HAND_SIZE} — your 3 starting "X" cards plus any level-up cards you've added.</p>
+              {handFull && (
+                <p className="field-hint over-cap-hint">
+                  Your {VOIDWARDEN_HAND_SIZE} scenario cards are all in play (hand, discarded, lost, or active) —
+                  move one to Reserve first. Swaps happen between scenarios.
+                </p>
+              )}
               {reserve.map((card) => (
                 <div key={card.id} className="action-card compact reserve-row">
                   <span>
                     {card.name} <span className="muted">({card.initiative})</span>
                   </span>
-                  <button type="button" className="link-btn small" onClick={() => moveToHand(card.id)}>
+                  <button
+                    type="button"
+                    className="link-btn small"
+                    disabled={handFull}
+                    title={handFull ? `Hand of ${VOIDWARDEN_HAND_SIZE} is full` : undefined}
+                    onClick={() => moveToHand(card.id)}
+                  >
                     To Hand
                   </button>
                 </div>

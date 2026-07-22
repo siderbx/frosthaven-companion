@@ -138,7 +138,8 @@ export function ConditionTracker({ character, onChange }: ConditionTrackerProps)
       <p className="field-hint">
         Suffer / Heal apply the condition rules (Brittle, Ward, Poison, Wound…) — use them instead of editing HP
         directly when damage or healing hits the Voidwarden. Start / End Turn drive Wound, Bane, Regenerate, and
-        round-condition expiry.
+        round-condition expiry — Confirm round on the Action Cards tab starts your turn too, so you can end it
+        from either tab.
       </p>
     </div>
   )

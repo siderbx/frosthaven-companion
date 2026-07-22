@@ -38,6 +38,13 @@ export const levelForXp = (xp: number): number => {
   return level
 }
 
+/**
+ * Cards taken into a scenario. The mat's hand size caps the cards outside
+ * Reserve — during a scenario that count spans hand + discarded + lost + active,
+ * so the limit holds even as cards are played.
+ */
+export const VOIDWARDEN_HAND_SIZE = 11
+
 export interface VoidwardenCardDetail {
   name: string
   /** Printed unlock level: 1 covers both the level-1 and level-X starting cards; 2–9 are the cards gained via the level-up choice. */

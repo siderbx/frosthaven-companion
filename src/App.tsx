@@ -197,7 +197,8 @@ function App() {
             key={scenarioEpoch}
             cards={cards}
             onChange={setCards}
-            characterLevel={character.level}
+            character={character}
+            onCharacterChange={setCharacter}
             deck={deck}
             onDeckChange={setDeck}
           />
