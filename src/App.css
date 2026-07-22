@@ -88,13 +88,15 @@
 .empty-hint {
   opacity: 0.75;
   line-height: 1.5;
+  max-width: 72ch; /* keep intro paragraphs at a readable measure on wide screens */
 }
 
 .field-hint {
-  font-size: 13px;
-  opacity: 0.6;
+  font-size: 14px;
+  opacity: 0.65;
   margin: 8px 0 0;
-  line-height: 1.4;
+  line-height: 1.45;
+  max-width: 72ch;
 }
 
 /* Inputs & buttons */
@@ -392,7 +394,7 @@
   border: 1px solid var(--border);
   background: var(--bg);
   color: var(--text);
-  font-size: 14px;
+  font-size: 15px;
   cursor: pointer;
   opacity: 0.65;
 }
@@ -584,7 +586,8 @@
 }
 
 .perk-label {
-  font-size: 15px;
+  font-size: 16px;
+  line-height: 1.45;
 }
 
 .perk-boxes {
@@ -597,7 +600,9 @@
   width: 28px;
   height: 28px;
   border-radius: 4px;
-  border: 1px solid var(--border);
+  /* Blend toward text color so empty boxes stay visible on dark panels —
+     they're the tab's primary tap target. */
+  border: 1px solid color-mix(in srgb, var(--text) 35%, var(--border));
   background: var(--bg);
   cursor: pointer;
   padding: 0;
@@ -905,6 +910,15 @@
   margin-right: 1px;
 }
 
+/* Dark-art glyphs (Dark element, Invisible, Curse) vanish against near-black
+   card rows — a faint ring keeps every inline icon legible in dark mode. */
+@media (prefers-color-scheme: dark) {
+  .game-icon-img {
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16);
+  }
+}
+
 /* Full-width input row shown while a mastery's text is being edited. */
 .mastery-edit {
   display: flex;
@@ -1030,6 +1044,16 @@
   }
 }
 
+/* Consistent rhythm for the zone headings (Hand / Used / Lost / Reserve) —
+   without this, back-to-back empty zones render as two cramped lines. */
+.card-column h3 {
+  margin: 24px 0 12px;
+}
+
+.card-column h3:first-child {
+  margin-top: 0;
+}
+
 .action-card {
   position: relative;
   border: 1px solid var(--border);
@@ -1077,6 +1101,8 @@
   gap: 6px;
 }
 
+/* Card top/bottom action text is the most-read content at the table — keep it
+   a step below body size but no smaller. */
 .side-btn {
   text-align: left;
   padding: 10px 12px;
@@ -1085,7 +1111,8 @@
   background: var(--panel-bg);
   color: var(--text);
   cursor: pointer;
-  font-size: 14px;
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 .side-btn.active {
@@ -1125,7 +1152,8 @@
 
 .active-effect-text {
   margin: 6px 0 0;
-  font-size: 14px;
+  font-size: 15px;
+  line-height: 1.5;
   color: var(--text-h);
 }
 
